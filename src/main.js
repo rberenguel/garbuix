@@ -213,8 +213,9 @@ document.body.addEventListener("keydown", async (ev) => {
 });
 
 async function handleOpenedFile(launchParams) {
+  console.log("Launch params:", launchParams);
   if (launchParams.files.length > 0) {
-    console.log("Got file(s)")
+    console.log("Got file(s)");
     const fileHandle = launchParams.files[0];
 
     const file = await fileHandle.getFile();
@@ -238,7 +239,7 @@ async function handleOpenedFile(launchParams) {
 }
 
 // Check if launched from file open and handle the file
-if ('launchQueue' in window) {
-  console.log("Launch queue")
+if ("launchQueue" in window) {
+  console.log("Launch queue");
   launchQueue.setConsumer(handleOpenedFile);
 }
