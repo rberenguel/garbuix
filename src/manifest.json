@@ -1,22 +1,22 @@
 {
-    "short_name": "Garbuix",
-    "version": "0.0.1",
-    "name": "Garbuix",
-    "description": "The graphviz / concept map functionality of Weave",
-    "icons": [
-      {
-        "src": "media/icon.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      },
-      {
-        "src": "media/icon192.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      }
-    ],
-    "start_url": "./index.html",
-    "display": "standalone",
-    "background_color": "#002b36",
-    "theme_color": "#c60"
-  }
+  "short_name": "Garbuix",
+  "version": "0.0.1",
+  "name": "Garbuix",
+  "description": "The graphviz / concept map functionality of Weave",
+  "icons": [
+    {
+      "src": "./media/icon512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "./media/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#002b36",
+  "theme_color": "#c60"
+}
