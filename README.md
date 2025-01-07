@@ -12,3 +12,7 @@ This is the concept map helper(s) and the graphviz renderer I had embedded in [W
 Most of my use of Weave for the past 3-4 months has been just using this, hence I think it is way better to isolate it and improve it.
 
 Maybe even add tests to the fancy functionalities (currently those are likely broken, I haven't tried).
+
+---
+
+Gemini helped with the icon and some questions about PWA stuff.

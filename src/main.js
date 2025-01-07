@@ -211,3 +211,32 @@ document.body.addEventListener("keydown", async (ev) => {
     }
   }
 });
+
+async function handleOpenedFile(launchParams) {
+  if (launchParams.files.length > 0) {
+    const fileHandle = launchParams.files[0];
+
+    const file = await fileHandle.getFile();
+
+    if (file) {
+      console.log("File opened:", file.name);
+      const fileReader = new FileReader();
+      fileReader.onload = (event) => {
+        const fileContents = event.target.result;
+        cmapContainer.innerText = fileContents;
+        setTimeout(() => {
+          const ev = new Event("keyup", { bubbles: true });
+          cmapContainer.dispatchEvent(ev);
+        }, 100);
+      };
+      fileReader.readAsText(file);
+    } else {
+      console.log("No file opened.");
+    }
+  }
+}
+
+// Check if launched from file open and handle the file
+if ('launchQueue' in window) {
+  launchQueue.setConsumer(handleOpenedFile);
+}
