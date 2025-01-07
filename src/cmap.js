@@ -4,7 +4,7 @@ export { cmapRender };
 
 //import { graphviz } from "./graphviz.js";
 
-const DEBUG = true;
+const DEBUG = false;
 
 // TODO: ctrl-k searches for internal URLs and introduces a URL=f-name tooltip=title at cursor location
 // TODO: same functionality is added to the "link" button, when the target panel is a cmap (with kind: literal)
