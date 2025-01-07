@@ -21,7 +21,7 @@
   "theme_color": "#c60",
   "file_handlers": [
     {
-      "action": "/index.html?open",
+      "action": "./index.html",
       "accept": {
         "text/cmap": [".cmap"]
       }
