@@ -5,12 +5,12 @@
     "description": "The graphviz / concept map functionality of Weave",
     "icons": [
       {
-        "src": "./media/icon.jpg",
+        "src": "../media/icon.jpg",
         "sizes": "512x512",
         "type": "image/jpg"
       }
     ],
-    "start_url": "./src/index.html",
+    "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#002b36",
     "theme_color": "#c60"
