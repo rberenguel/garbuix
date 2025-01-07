@@ -11,9 +11,18 @@ cmapContainer.classList.add("source-code", "item");
 container.appendChild(cmapContainer);
 
 cmapContainer.innerText = `
+# foo [calc]
 $DARK
-a -> b A link
-c A node
+A -> +_B 4
+C -> +_B 5
++_B sum
+x -> &&_z 90%
+y -> &&_z 30%
+&&_z and
+n -> *=_m 5
+*=_m carry-mul
+*=_m -> :=_foo 1.27
+:=_foo foo
 `;
 
 const graphvizSourceContainer = d();
