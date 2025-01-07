@@ -1,0 +1,103 @@
+:root {
+  --dark-background: #002b36;
+  --slighty-lighter-dark-background: #204b56;
+  --subtly-light-background: #deeef2;
+  --subtly-dark-background: #1d1603;
+  --light-background: #fdf6e3;
+  --gray-text: #a9babc;
+  --grey-text: #a9babc;
+  --lighter-gray-text: #c9dadc;
+  --lighter-grey-text: #c9dadc;
+  --subtly-transparent: #a9babc77;
+  --bright-orange: #c60;
+  --solarized-pink: #d33682;
+  --brown: #842;
+  --less-bright-yellow: #aa6;
+  --bright-yellow: #cc6;
+  --bright-blue: #06c;
+  --very-bright-red: #c00;
+  --bright-red: #c00;
+  --wired-code: #2aa198;
+  --yellow: #b58900;
+  --dark-orange: #a60;
+  --dark-red: #800;
+  --dark-green: #060;
+  --green: #090;
+}
+
+body {
+  background: var(--dark-background) !important;
+  font-size: 16px;
+  color: var(--lighter-gray-text) !important;
+}
+
+#container {
+  display: flex; /* Enable flexbox layout */
+  height: 100vh;
+}
+
+.item {
+  width: 48% !important; /* Take up slightly less than half the width */
+  margin: 1%; /* Add some margin between the divs */
+}
+
+#cmap {
+  width: 35% !important;
+}
+
+/* Media query for screens wider than 1000px and landscape orientation */
+@media (min-width: 1000px) {
+  .container {
+    flex-direction: row; /* Arrange items horizontally */
+  }
+  .item:not(:first-child) {
+    /* Hide all but the first item */
+    display: none;
+  }
+  .item:nth-child(-n + 2) {
+    /* Show the first two divs */
+    display: block;
+  }
+}
+
+/* Default styles for other screen sizes or portrait orientation */
+@media (max-width: 1000px) or (orientation: portrait) {
+  .container {
+    flex-direction: column; /* Arrange items vertically */
+  }
+
+  .item:not(:first-child) {
+    /* Hide all but the first item */
+    display: none;
+  }
+}
+
+.source-code {
+  white-space: pre-wrap;
+  font-family: monoidregular;
+  padding: 0.5em;
+}
+
+.item:focus {
+  outline: none; /* Remove default outline */
+  box-shadow: 0 0 3px #c60; /* Add a shadow */
+}
+
+#modal {
+  position: fixed;
+  font-family: "monoidregular";
+  top: 75vh;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 30px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 1001;
+  display: none;
+}
+
+.error {
+  box-shadow: 0 0 5px red;
+}
