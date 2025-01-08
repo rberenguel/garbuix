@@ -48,20 +48,50 @@ container.appendChild(errorsContainer);
 
 const render = async () => {
   const gv = cmapRender(cmapContainer);
-  graphvizSourceContainer.innerText = gv;
-  await graphvizRender(gv, renderedContainer, errorsContainer);
+  graphvizSourceContainer.innerHTML = "";
+  //graphvizSourceContainer.innerText = gv;
+  const nums = d();
+  const wrapper = d();
+  wrapper.style = "display: flex;";
+  nums.classList.add("line-numbers");
+  graphvizSourceContainer.appendChild(wrapper);
+  const source = d();
+  wrapper.appendChild(nums);
+  const lines = gv.split("\n").filter(Boolean);
+  nums.innerHTML = lines
+    .concat(lines)
+    .map((_, i) => `<div>${i + 1}</div>`)
+    .join("");
+  wrapper.appendChild(source);
+  source.innerText = gv;
+  await graphvizRender(gv, cmapContainer, renderedContainer, errorsContainer);
 };
 
 cmapContainer.addEventListener("keyup", async (ev) => {
   await render();
+  if (cmapContainer.mark) {
+    cmapContainer.mark.unmark();
+  }
 });
 
 cmapContainer.addEventListener("keydown", async (ev) => {
   await render();
+  if (cmapContainer.mark) {
+    cmapContainer.mark.unmark();
+  }
 });
 
 cmapContainer.addEventListener("input", async (ev) => {
   await render();
+  if (cmapContainer.mark) {
+    cmapContainer.mark.unmark();
+  }
+});
+
+cmapContainer.addEventListener("click", (ev) => {
+  if (cmapContainer.mark) {
+    cmapContainer.mark.unmark();
+  }
 });
 
 // For some reason insisting makes it work better.
@@ -134,6 +164,11 @@ async function openFile() {
   }
 }
 
+const putInFront = (divId) => {
+  const itemToMove = document.getElementById(divId);
+  container.insertBefore(itemToMove, container.firstChild);
+};
+
 async function saveFile() {
   try {
     const options = {
@@ -180,6 +215,35 @@ document.body.addEventListener("keydown", async (ev) => {
     await render();
     return;
   }
+  if (ev.key === "e" && ev.metaKey) {
+    console.log("M e");
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.stopImmediatePropagation();
+    if (container.children[0].id === "cmap") {
+      putInFront("errors");
+      putInFront("source");
+    } else {
+      putInFront("graphviz");
+      putInFront("cmap");
+    }
+    return;
+  }
+  if (ev.key === "g" && ev.metaKey) {
+    console.log("M g");
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.stopImmediatePropagation();
+    if (container.children[0].id === "cmap") {
+      putInFront("errors");
+      putInFront("source");
+    } else {
+      putInFront("graphviz");
+      putInFront("cmap");
+    }
+    return;
+  }
+
   if (modal.style.display === "block") {
     console.info("modal visible, stopping propagation");
     ev.preventDefault();
@@ -197,8 +261,7 @@ document.body.addEventListener("keydown", async (ev) => {
         modal.style.display = "none";
         return;
       }
-      const itemToMove = document.getElementById(vizP[0].textContent);
-      container.insertBefore(itemToMove, container.firstChild);
+      putInFront(vizP[0].textContent);
       searchText = "";
       modal.style.display = "none";
     } else if (ev.key.length === 1) {

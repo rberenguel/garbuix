@@ -1,0 +1,32 @@
+# Test - payoffs [calc]
+$DARK
+
+
+Quit Quit Job
+
+*=_Llama Open a llama farm
+*=_Promo Stay, go for promotion
+
+Quit -> *=_Llama 80% \l yes
+Quit -> *=_Promo 20% \l no
+
+*=_Llama -> *=_llama_farm_success 70% \n success
+*=_Llama -> *=_llama_farm_failure 30% \n failure
+
+*=_Promo -> *=_promo_success 50% \n success
+*=_Promo -> *=_promo_failure 50% \n fail
+
+*=_llama_farm_success -> :=_HappyLlama 500000
+*=_llama_farm_failure -> :=_SadLlama -100000
+
+*=_promo_success -> :=_HappyPromo 10000
+*=_promo_failure -> :=_SadPromo 0
+
+:=_HappyLlama -> +_LlamaPayoff
+:=_SadLlama -> +_LlamaPayoff
+
+:=_HappyPromo -> +_PromoPayoff
+:=_SadPromo -> +_PromoPayoff
+
++_LlamaPayoff \n Potential payoff; color="$GREEN" penwidth=3
++_PromoPayoff \n Potential payoff; color="$RED" penwidth=3

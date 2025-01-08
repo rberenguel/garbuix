@@ -71,7 +71,7 @@ digraph G {
 }
     `;
 
-const graphvizRender = async (gv, d, e) => {
+const graphvizRender = async (gv, c, d, e) => {
   try {
     if (!document.graphviz) {
       document.graphviz = await Graphviz.load();
@@ -89,6 +89,193 @@ const graphvizRender = async (gv, d, e) => {
         dblClickZoomEnabled: false,
       });
       d.classList.remove("error");
+
+      /* Big block of mess starts*/
+      console.log(c);
+      d.mark = new Mark(c);
+      c.mark = d.mark;
+      d.addEventListener("contextmenu", (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        ev.stopImmediatePropagation();
+      });
+      const links = Array.from(d.querySelectorAll("a")); //
+      links.forEach((a) => a.setAttribute("target", "_blank"));
+      links.forEach((a) => {
+        a.addEventListener("click", (ev) => {
+          // hrefs are visited on click, not mouseup or down
+          const node = a.closest(".node");
+          if (node && node.held) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            ev.stopImmediatePropagation();
+            node.held = false;
+          } else {
+            const href = a.href.baseVal;
+            if (!href.startsWith("http")) {
+              // this is something weird from SVG
+              ev.preventDefault();
+              ev.stopPropagation();
+              ev.stopImmediatePropagation();
+              // TODO this comes from formatters.js as is
+              const n = weave.bodies().length;
+              const bodyId = `b${n}`; // TODO NO, this is not good enough
+              createPanel(weave.root, bodyId, weave.buttons(weave.root), weave);
+              const body = document.getElementById(bodyId);
+              iloadIntoBody(href, body);
+              toTop(body)(); // This is not working well
+            }
+          }
+        });
+      });
+      const hasPercentage = (text) => /^.* \([0-9]+%\)$/.test(text);
+      const hasPercentageEdge = (text) => /^[0-9]+%.*$/.test(text);
+      const getPercentageString = (text) => text.split(" ").slice(-1)[0];
+      const getPercentage = (text) => text.replace("(", "").replace(")", "");
+      const getPercentageEdgeString = (text) => text.split(" ")[0];
+      const nodes = Array.from(d.querySelectorAll(".node"));
+      const edges = Array.from(d.querySelectorAll(".edge"));
+      edges.forEach((e) => {
+        // THIS IS NOW PRETTY MUCH DUPLICATED 100%
+        let title = "";
+        if (e.querySelector("text")) {
+          title = e.querySelector("text").textContent;
+        }
+        // This should be conditional on being a op graph
+        if (hasPercentageEdge(title)) {
+          const polygon = e.querySelector("polygon"); // In the arrowhead
+          const pathLength = polygon.getTotalLength();
+
+          // Get the coordinates of the point at 50% of the path length
+          const point = polygon.getPointAtLength(pathLength * 0.5);
+          const text = e.querySelector("text");
+          const pbcr = polygon.getBoundingClientRect();
+          const size = parseFloat(text.getAttribute("font-size"));
+          const percentageString = getPercentageEdgeString(title);
+          const props = {
+            cx: point.x,
+            cy: point.y,
+            radius: size / 2,
+          };
+
+          const pct = parseFloat(getPercentage(percentageString)) / 100.0;
+          if (percentageString.endsWith("%")) {
+            let color = "#dc322fFF"; // Solarized red
+            if (pct >= 0.4) {
+              color = "#b58900FF"; // Solarized yellow
+            }
+            if (pct >= 0.8) {
+              color = "#859900FF"; // Solarized green
+            }
+            props.color = color;
+            createPercentagePieChart(e, 100 * pct, props);
+          }
+        }
+      });
+      nodes.forEach((n) => {
+        const title = n.querySelector("text").textContent;
+        const titleObj = n.querySelector("title").textContent;
+        if (hasPercentage(title)) {
+          const path = n.querySelector("path");
+          const text = n.querySelector("text");
+          const pbcr = path.getBoundingClientRect();
+          const x = text.x.baseVal[0].value;
+          const y = text.y.baseVal[0].value;
+          const size = parseFloat(text.getAttribute("font-size"));
+          const percentageString = getPercentageString(title);
+          const props = {
+            cx: x + pbcr.width - size / 2,
+            cy: y + pbcr.height / 2,
+            radius: size / 2,
+          };
+          const pct = parseFloat(getPercentage(percentageString)) / 100.0;
+          if (percentageString.endsWith("%")) {
+            let color = "#dc322fFF"; // Solarized red
+            if (pct >= 0.4) {
+              color = "#b58900FF"; // Solarized yellow
+            }
+            if (pct >= 0.8) {
+              color = "#859900FF"; // Solarized green
+            }
+            props.color = color;
+            createPercentagePieChart(n, 100 * pct, props);
+          }
+        }
+        interact(n).on("hold", (ev) => {
+          n.held = true;
+          ev.preventDefault();
+          ev.stopPropagation();
+          ev.stopImmediatePropagation();
+          console.log("Holding ", n);
+          if (ev.button != 0) {
+            // Want to avoid right-click-menu counting as hold, very annoying
+            return;
+          }
+          ev.preventDefault();
+          ev.stopPropagation();
+          ev.stopImmediatePropagation();
+          c.mark.unmark();
+          console.log(titleObj);
+          c.mark.mark(titleObj, { accuracy: "exactly" });
+        });
+        if (title.includes("🟨") || title.includes("✅")) {
+          const id = n.closest("g").id;
+          const xmlns = "http://www.w3.org/2000/svg"; // SVG namespace URI
+          const tspan = document.createElementNS(xmlns, "tspan");
+          tspan.classList.add("fawesome");
+          if (title.startsWith("🟨")) {
+            // Open checkbox case
+            tspan.innerHTML = ""; // fontawesome glyph for open checkbox. For some reason unicode was not working
+            tspan.checked = false;
+            n.querySelector("text").textContent = title.replace("🟨", "");
+            n.querySelector("text").prepend(tspan);
+            n.classList.remove("crossed");
+          }
+          if (title.startsWith("✅")) {
+            // Closed checkbox case
+            tspan.innerHTML = ""; // fontawesome glyph for open checkbox. For some reason unicode was not working
+            tspan.checked = true;
+            n.querySelector("text").textContent = title.replace("✅", "");
+            n.querySelector("text").prepend(tspan);
+            n.classList.add("crossed");
+          }
+          tspan.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            ev.stopImmediatePropagation();
+            if (!tspan.checked) {
+              tspan.innerHTML = ""; // fontawesome glyph for closed checkbox
+              n.classList.add("crossed");
+              for (let node of cmap.childNodes) {
+                console.log(node.textContent);
+                console.log(id);
+                const regex = new RegExp(`.*id\\s*=\\s*"${id}".*`);
+                if (regex.test(node.textContent)) {
+                  console.log("MATCH");
+                  console.log(node);
+                  node.textContent = node.textContent
+                    .replace("[]", "[X]")
+                    .replace("[ ]", "[X]");
+                }
+              }
+            } else {
+              tspan.innerHTML = ""; // fontawesome glyph for open checkbox
+              n.classList.remove("crossed");
+              for (let node of cmap.childNodes) {
+                const regex = new RegExp(`.*id\\s*=\\s*"${id}".*`);
+                if (regex.test(node.textContent)) {
+                  node.textContent = node.textContent
+                    .replace("[x]", "[ ]")
+                    .replace("[X]", "[ ]");
+                }
+              }
+            }
+            tspan.checked = !tspan.checked;
+          });
+        }
+      });
+
+      /* Big block of mess ends */
     }
   } catch (err) {
     const reloadWorthyErrors = [
@@ -290,6 +477,7 @@ const graphviz = {
               ev.stopPropagation();
               ev.stopImmediatePropagation();
               div.mark.unmark();
+              console.log(titleObj);
               div.mark.mark(titleObj, { accuracy: "exactly" });
             });
             if (title.includes("🟨") || title.includes("✅")) {

@@ -25,10 +25,16 @@
   --green: #090;
 }
 
+html {
+  scrollbar-color: var(--bright-orange) var(--dark-background); /* Set scrollbar thumb and track color */
+  scrollbar-width: thin; /* Set scrollbar width */
+}
+
 body {
   background: var(--dark-background) !important;
   font-size: 16px;
   color: var(--lighter-gray-text) !important;
+  overflow-x: hidden;
 }
 
 #container {
@@ -36,13 +42,41 @@ body {
   height: 100vh;
 }
 
+div {
+  border-radius: 0.1em;
+}
+
 .item {
-  width: 48% !important; /* Take up slightly less than half the width */
-  margin: 1%; /* Add some margin between the divs */
+  width: 49% !important; /* Take up slightly less than half the width */
+  margin: 0.1%; /* Add some margin between the divs */
 }
 
 #cmap {
   width: 35% !important;
+  box-shadow: 0 0 3px var(--bright-orange); /* Add a shadow */
+  padding: 2em;
+}
+
+#cmap:focus {
+  outline: none; /* Remove default outline */
+  box-shadow: 0 0 8px var(--bright-orange); /* Add a shadow */
+}
+
+#graphviz {
+  box-shadow: 0 0 3px var(--bright-yellow); /* Add a shadow */
+  padding: 0.5em;
+  width: 65% !important;
+  overflow: hidden;
+}
+
+#errors {
+  box-shadow: 0 0 3px var(--very-bright-red); /* Add a shadow */
+  width: 49% !important;
+}
+
+#source {
+  box-shadow: 0 0 3px var(--bright-blue); /* Add a shadow */
+  width: 49% !important;
 }
 
 /* Media query for screens wider than 1000px and landscape orientation */
@@ -78,11 +112,6 @@ body {
   padding: 0.5em;
 }
 
-.item:focus {
-  outline: none; /* Remove default outline */
-  box-shadow: 0 0 3px #c60; /* Add a shadow */
-}
-
 #modal {
   position: fixed;
   font-family: "monoidregular";
@@ -99,5 +128,38 @@ body {
 }
 
 .error {
-  box-shadow: 0 0 5px red;
+  border: 2px solid color-mix(in srgb, var(--bright-red) 80%, transparent);
+  box-shadow: 0 0 3px var(--bright-red) !important; /* Add a shadow */
+}
+
+.line-numbers {
+  display: flex;
+  flex-direction: column; /* Stack numbers vertically */
+  text-align: right; /* Align numbers to the right */
+  width: fit-content; /* Make div as narrow as possible */
+  min-width: 1em; /* Ensure space for 2-digit numbers with 0.5 font */
+  user-select: none;
+}
+
+.line-numbers > div {
+  /* Line numbers kind of fit well enough to find errors, only */
+  font-family: "monoidregular";
+  width: fit-content;
+  font-size: round(50%, 1px);
+  /* Strange magic to get these to fit. It seems min-height adds 1/2 of height only */
+  min-height: round(2em, 1px);
+  padding-top: round(1em, 1px);
+}
+
+.line-numbers > div:nth-child(odd) {
+  color: #aaa;
+}
+
+.line-numbers > div:nth-child(even) {
+  color: #777;
+}
+
+mark {
+  background: orange;
+  color: black;
 }
