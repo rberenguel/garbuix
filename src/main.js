@@ -10,8 +10,7 @@ cmapContainer.id = "cmap";
 cmapContainer.classList.add("source-code", "item");
 container.appendChild(cmapContainer);
 
-cmapContainer.innerText = `
-# foo [calc]
+cmapContainer.innerText = `# foo [calc]
 $DARK
 A -> +_B 4
 C -> +_B 5
