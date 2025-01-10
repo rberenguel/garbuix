@@ -1,7 +1,12 @@
 export { convert, hasArrow, getAttrsArrow };
 
 import { DEBUG } from "./flags.js";
-import { headerT, solarizedColors, darkColors } from "./templates.js";
+import {
+  headerT,
+  solarizedColors,
+  darkColors,
+  lateBinding,
+} from "./templates.js";
 import { operators } from "./present_eval.js";
 
 // Although this is a big dense, it is just a pretty direct term replacer,
@@ -72,6 +77,8 @@ const convert = (text) => {
   } else {
     lines = lightColors.split("\n").concat(sliced);
   }
+  lines = lines.concat(lateBinding.split("\n"));
+  console.log(lines);
   let clusters = [];
   for (let line of lines) {
     if (line.trim() === "$DARK") {
@@ -91,10 +98,10 @@ const convert = (text) => {
       continue;
     }
     if (hasReplacement(line)) {
-      if (DEBUG) console.log(`Replacement found on line '${line}'`);
+      if (DEBUG.convert) console.log(`Replacement found on line '${line}'`);
       const key = getReplacement(line)[0];
       const value = getReplacement(line)[1];
-      if (DEBUG) console.log(`Replacement found ${key} ${value}`);
+      if (DEBUG.convert) console.log(`Replacement found ${key} ${value}`);
       replacements.push([key, value]);
       continue;
     }
@@ -156,8 +163,9 @@ const convert = (text) => {
     const linkUTF = hasURL(attrs[1]) ? " 🔗" : "";
     let [label, props] = attrs[1].split(";");
     if (hasArrow(line) && label.trim() == "!") {
+      console.log("It is invisible");
       label = "";
-      props = props ? props : "" + "style=invis";
+      props = (props ? props : "") + "style=invis";
     }
     label = label.trim();
     label = label.replace(/^\[\]/, "🟨").replace(/^\[ \]/, "🟨");
@@ -184,7 +192,7 @@ const convert = (text) => {
   }
   for (let replacement of replacements) {
     const [key, value] = replacement;
-    if (DEBUG) console.info(`(header) Replacing ${key} by ${value}`);
+    if (DEBUG.convert) console.info(`(header) Replacing ${key} by ${value}`);
     header = header.replaceAll(key, value);
   }
   let joined = header + "\n" + result.join("\n");

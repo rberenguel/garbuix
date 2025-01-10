@@ -1,5 +1,6 @@
 export { DEBUG };
 
 const DEBUG = {
-  evaluate: true,
+  evaluate: false,
+  convert: true,
 };

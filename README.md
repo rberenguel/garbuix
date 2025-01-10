@@ -15,4 +15,13 @@ Maybe even add tests to the fancy functionalities (currently those are likely br
 
 ---
 
-Gemini helped with the icon and some questions about PWA stuff.
+## Acknowledgements
+
+- Gemini helped with the icon and some questions about PWA stuff.
+- [interact](https://interactjs.io/)
+- [WASM graphviz by hpcc](https://github.com/hpcc-systems/hpcc-js-wasm)
+- [SVG panzoom](https://github.com/bumbu/svg-pan-zoom)
+- [mark.js](https://markjs.io/)
+- [idb-keyval by Jake Archibald](https://github.com/jakearchibald/idb-keyval) (not used yet, but I plan on, I have used it before)
+- [my own cmap helper](https://mostlymaths.net/2023/07/concept-maps-helper.html/)
+- [my own Weave editor](https://github.com/rberenguel/weave)

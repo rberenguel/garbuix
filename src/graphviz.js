@@ -2,6 +2,8 @@ export { graphvizRender };
 
 import { Graphviz } from "../lib/graphviz.js";
 
+import { reverseOperatorMapping } from "./cmap/present_eval.js";
+
 const dotExample = `
 digraph G {
   layout="dot"
@@ -87,7 +89,14 @@ const graphvizRender = async (gv, c, d, e) => {
       d.panzoom = svgPanZoom(d.querySelector("svg"), {
         controlIconsEnabled: true,
         dblClickZoomEnabled: false,
+        minZoom: 0.05,
+        maxZoom: 20,
       });
+      if (pan) {
+        // Beware of order!
+        d.panzoom.zoom(zoom);
+        d.panzoom.pan(pan);
+      }
       d.classList.remove("error");
 
       /* Big block of mess starts*/
@@ -174,6 +183,7 @@ const graphvizRender = async (gv, c, d, e) => {
       });
       nodes.forEach((n) => {
         const title = n.querySelector("text").textContent;
+        const nodeTitle = n.querySelector("title").textContent;
         const titleObj = n.querySelector("title").textContent;
         if (hasPercentage(title)) {
           const path = n.querySelector("path");
@@ -215,10 +225,20 @@ const graphvizRender = async (gv, c, d, e) => {
           ev.stopPropagation();
           ev.stopImmediatePropagation();
           c.mark.unmark();
-          console.log(titleObj);
+          for (let k in reverseOperatorMapping) {
+            console.log(k);
+            if (titleObj.startsWith(k)) {
+              console.log("Does");
+              c.mark.mark(titleObj.replace(k, reverseOperatorMapping[k]), {
+                accuracy: "exactly",
+              });
+              return;
+            }
+          }
           c.mark.mark(titleObj, { accuracy: "exactly" });
         });
         if (title.includes("🟨") || title.includes("✅")) {
+          let cleanedTitle = "";
           const id = n.closest("g").id;
           const xmlns = "http://www.w3.org/2000/svg"; // SVG namespace URI
           const tspan = document.createElementNS(xmlns, "tspan");
@@ -228,6 +248,7 @@ const graphvizRender = async (gv, c, d, e) => {
             tspan.innerHTML = ""; // fontawesome glyph for open checkbox. For some reason unicode was not working
             tspan.checked = false;
             n.querySelector("text").textContent = title.replace("🟨", "");
+            cleanedTitle = n.querySelector("text").textContent.trim();
             n.querySelector("text").prepend(tspan);
             n.classList.remove("crossed");
           }
@@ -236,6 +257,7 @@ const graphvizRender = async (gv, c, d, e) => {
             tspan.innerHTML = ""; // fontawesome glyph for open checkbox. For some reason unicode was not working
             tspan.checked = true;
             n.querySelector("text").textContent = title.replace("✅", "");
+            cleanedTitle = n.querySelector("text").textContent.trim();
             n.querySelector("text").prepend(tspan);
             n.classList.add("crossed");
           }
@@ -243,39 +265,48 @@ const graphvizRender = async (gv, c, d, e) => {
             ev.preventDefault();
             ev.stopPropagation();
             ev.stopImmediatePropagation();
+            const cmapLines = cmap.innerText.split("\n");
+            let rewritten = [];
             if (!tspan.checked) {
               tspan.innerHTML = ""; // fontawesome glyph for closed checkbox
               n.classList.add("crossed");
-              for (let node of cmap.childNodes) {
-                console.log(node.textContent);
+              for (let line of cmapLines) {
                 console.log(id);
-                const regex = new RegExp(`.*id\\s*=\\s*"${id}".*`);
-                if (regex.test(node.textContent)) {
+                console.log(title);
+                console.log(cleanedTitle);
+                //const regex = new RegExp(`.*id\\s*=\\s*"${id}".*`);
+                const regex = new RegExp(
+                  ".*\\[\\s{0,1}\\] " + `${cleanedTitle}.*`,
+                );
+                console.log(regex);
+                console.log(regex.test(line));
+                if (regex.test(line)) {
                   console.log("MATCH");
-                  console.log(node);
-                  node.textContent = node.textContent
-                    .replace("[]", "[X]")
-                    .replace("[ ]", "[X]");
+                  line = line.replace("[]", "[X]").replace("[ ]", "[X]");
                 }
+                rewritten.push(line);
               }
             } else {
               tspan.innerHTML = ""; // fontawesome glyph for open checkbox
               n.classList.remove("crossed");
-              for (let node of cmap.childNodes) {
-                const regex = new RegExp(`.*id\\s*=\\s*"${id}".*`);
-                if (regex.test(node.textContent)) {
-                  node.textContent = node.textContent
-                    .replace("[x]", "[ ]")
-                    .replace("[X]", "[ ]");
+              for (let line of cmapLines) {
+                const regex = new RegExp(
+                  ".*\\[[x|X]\\] " + `${cleanedTitle}.*`,
+                );
+                if (regex.test(line)) {
+                  line = line.replace("[x]", "[ ]").replace("[X]", "[ ]");
                 }
+                rewritten.push(line);
               }
             }
+            cmap.innerText = rewritten.join("\n");
             tspan.checked = !tspan.checked;
           });
         }
       });
 
       /* Big block of mess ends */
+      e.innerHTML = "";
     }
   } catch (err) {
     const reloadWorthyErrors = [

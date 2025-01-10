@@ -10,19 +10,69 @@ cmapContainer.id = "cmap";
 cmapContainer.classList.add("source-code", "item");
 container.appendChild(cmapContainer);
 
-cmapContainer.innerText = `# foo [calc]
+interact("#cmap").resizable({
+  edges: { left: false, right: true, bottom: false, top: false },
+
+  listeners: {
+    move(event) {
+      var target = event.target;
+      var x = parseFloat(target.getAttribute("data-x")) || 0;
+      var y = parseFloat(target.getAttribute("data-y")) || 0;
+
+      // update the element's style
+      target.style.width = event.rect.width + "px";
+      target.style.height = event.rect.height + "px";
+
+      // translate when resizing from top or left edges
+      x += event.deltaRect.left;
+      y += event.deltaRect.top;
+
+      target.style.transform = "translate(" + x + "px," + y + "px)";
+
+      target.setAttribute("data-x", x);
+      target.setAttribute("data-y", y);
+    },
+  },
+  modifiers: [
+    interact.modifiers.restrictEdges({
+      outer: "parent",
+    }),
+
+    interact.modifiers.restrictSize({
+      min: { width: 100, height: 50 },
+    }),
+  ],
+
+  inertia: true,
+});
+
+async function loadFile(filePath) {
+  try {
+    const response = await fetch(filePath);
+    if (!response.ok) {
+      throw new Error(`Failed to load file: ${response.status}`);
+    }
+    return await response.text();
+  } catch (error) {
+    console.error("Error loading file:", error);
+    // Handle the error appropriately (e.g., show an error message)
+    return null;
+  }
+}
+
+/*`# foo [calc]
 $DARK
-A -> +_B 4
-C -> +_B 5
-+_B sum
-x -> &&_z 90%
-y -> &&_z 30%
-&&_z and
-n -> *=_m 5
-*=_m carry-mul
-*=_m -> :=_foo 1.27
-:=_foo foo
+
+$TITLEFONTCOLOR=red
+foo [ ] foo
+.=_a A
+w -> .=_a 5
+`
+*/
+/*
+`
 `;
+*/
 
 const graphvizSourceContainer = d();
 
@@ -104,6 +154,7 @@ let searchText = "";
 const modal = document.getElementById("modal");
 
 const metaP = () => {
+  return; // Disabling for now
   const items = Array.from(document.querySelectorAll(".item"));
   const gcsd = (d) => window.getComputedStyle(d).display;
   const hidden = items.filter((d) => gcsd(d) === "none");
@@ -305,3 +356,35 @@ if ("launchQueue" in window) {
   console.log("Launch queue");
   launchQueue.setConsumer(handleOpenedFile);
 }
+
+const helpModal = document.getElementById("help-modal");
+
+const help = document.getElementById("help-button");
+
+const helpModalToggle = () => {
+  console.log("toggled");
+  if (helpModal.style.display === "block") {
+    helpModal.style.display = "none";
+  } else {
+    helpModal.style.display = "block";
+  }
+};
+
+help.addEventListener("click", (ev) => {
+  console.log("foo");
+  helpModalToggle();
+});
+
+helpModal.addEventListener("click", helpModalToggle);
+
+const init = async () => {
+  const def = await loadFile("../examples/main-example.cmap");
+  cmapContainer.innerText = def;
+  await render();
+  // Since this graph is relatively large, loading it puts it in a weird place. This should be good enough,
+  // and could actually be a good default when loading files.
+  document.getElementById("graphviz").panzoom.zoom(0.5);
+  document.getElementById("graphviz").panzoom.pan({ x: -250, y: -500 });
+};
+
+init();

@@ -9,6 +9,8 @@
   <link href="../fonts/inter.css" rel="stylesheet" />
   <link href="../fonts/monoid.css" rel="stylesheet" />
   <link href="../fonts/roboto.css" rel="stylesheet" />
+  <link href="../fonts/regular.css" rel="stylesheet" />
+  <link href="../fonts/solid.css" rel="stylesheet" />
   <script src="../lib/mark.js" charset="UTF-8"></script>
   <script src="../lib/svgpanzoom.js"></script>
   <script src="../lib/interact.min.js"></script>
@@ -17,4 +19,72 @@
   <div id="container"></div>
   <div id="modal"></div>
   <script type="module" src="./main.js"></script>
+  <div id="help-button">?</div>
+  <div id="help-modal">
+    <h1>Garbuix</h1>
+    <blockquote>
+      From Catalan, tangle or mess.
+      <a href="https://github.com/rberenguel/garbuix">Github</a>
+    </blockquote>
+    <hr />
+    <p>
+      On the left hand side <code class="high">&#x261C;</code> you have a
+      resizable, editable text field where you can write a simplified form of
+      the <code>dot</code> language used by Graphviz, while on the right
+      <code class="high">&#x261E;</code> you will find the rendered Graphviz,
+      scrollable and zoomable. Not downloadable <i>yet</i> though.
+    </p>
+    <p>
+      If the border of the render turns
+      <span style="color: var(--bright-red)">red</span>, it means you have some
+      error: press <code>Cmd-G</code> to switch between the main view
+      (simplified and rendered) and a view with the generated dot and potential
+      errors. You can copy the generated dot and run graphviz locally to
+      generate SVGs, PNGs, etc.
+    </p>
+    <p>
+      There is still not a lot of documentation on the syntax, but you can find
+      some pointers here:
+    </p>
+    <ul>
+      <li>
+        The
+        <a
+          href="https://github.com/rberenguel/garbuix/tree/gh-pages/examples/main-example.cmap"
+          >main-example.cmap</a
+        >
+        file you get when you start
+      </li>
+      <li>
+        <a
+          target="_blank"
+          href="https://github.com/rberenguel/garbuix/blob/gh-pages/src/cmap.js#L27"
+          >Basic description I used as an initial spec</a
+        >
+      </li>
+      <li>
+        <a
+          target="_blank"
+          href="https://github.com/rberenguel/garbuix/tree/gh-pages/examples"
+          >Examples folder: open these and copy-paste on the left side panel to
+          see what can be done</a
+        >
+      </li>
+    </ul>
+    <p>
+      You can save your diagram (with a <code>cmap</code> extension, for
+      <i
+        ><a href="https://mostlymaths.net/2021/10/concept-maps.html/"
+          >concept map</a
+        ></i
+      >) with <code>Cmd-S</code>, and can load with <code>Cmd-O</code>. You can
+      also tell your operating system to open any <code>cmap</code> file with
+      Garbuix.
+    </p>
+    <hr />
+    <p style="font-size: 50%">
+      Ruben Berenguel, 2025 (see list of used libraries in
+      <a href="https://github.com/rberenguel/garbuix">Github</a>)
+    </p>
+  </div>
 </body>

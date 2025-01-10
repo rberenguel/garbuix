@@ -1,6 +1,11 @@
 # Test - payoffs [calc]
 $DARK
 
+/*
+This is an example of a "payoff diagram". The syntax is still a bit fluid, because it is quite hard to write as is.
+I think it will be somewhat clear what this does if you paste it. At some point I will add extensive documentation,
+but before I want to figure out what this is for. Not even I do know.
+*/
 
 Quit Quit Job
 

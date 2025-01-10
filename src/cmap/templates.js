@@ -1,4 +1,4 @@
-export { headerT, solarizedColors, darkColors, lightColors };
+export { headerT, solarizedColors, darkColors, lightColors, lateBinding };
 
 const headerT = `
 digraph G {
@@ -6,13 +6,13 @@ digraph G {
   margin="0.5"
   bgcolor="$BACKGROUNDCOLOR"
   rankdir="TB"
-  fontname="roboto"
+  fontname="$FONTNAME"
   fontcolor="$FONTCOLOR"
   nodesep="0.6"
   overlap="scale"
   compound="true"
   node [
-    fontname = "roboto"
+    fontname = "$FONTNAME"
     style="rounded,filled"
     labelloc="c"
     margin="0.5,0.3"
@@ -28,7 +28,7 @@ digraph G {
     penwidth="2"
     color="$EDGECOLOR"
     fontcolor="$FONTCOLOR"
-    fontname="roboto"
+    fontname="$FONTNAME"
       fontsize="22"
       arrowhead="normal" // Latest papers about cmaps have recovered heads
   ];
@@ -38,8 +38,10 @@ digraph G {
     fillcolor="$NODEFILLCOLOR"
     color="$NODECOLOR"
   ];
-  fontsize="38"
+  fontsize="$TITLEFONTSIZE"
+  fontname="$TITLEFONTNAME"
   labelloc="t";
+  fontcolor="$TITLEFONTCOLOR"
   `;
 
 const solarizedColors = `
@@ -76,4 +78,16 @@ $NODECOLOR=#000000FF
 $BACKGROUNDCOLOR=#FFFFFFFF
 $NODEFILLCOLOR=$BACKGROUNDCOLOR
 $FONTCOLOR=#000000FF
+`;
+
+// These are replacements that are only used as fallbacks, so they also get themselves replaced when used.
+// Since red=cyan or similar would be an error, they are wrapped in a comment.
+
+const lateBinding = `
+/*
+$FONTNAME=roboto
+$TITLEFONTCOLOR=$FONTCOLOR
+$TITLEFONTSIZE=38
+$TITLEFONTNAME=$FONTNAME
+*/
 `;

@@ -1,4 +1,11 @@
-export { operators, isOp, isPercent, isNumber, formatVal };
+export {
+  operators,
+  reverseOperatorMapping,
+  isOp,
+  isPercent,
+  isNumber,
+  formatVal,
+};
 
 const isNumber = (str) => {
   const num = parseFloat(str); // Or Number(str)
@@ -58,8 +65,16 @@ const operators = {
   "+_": { op: opSum, name: "op_sum_" },
   "*=_": { op: opCarryMul, name: "op_carry_mul_" },
   ":=_": { op: (v) => parseFloat(v), name: "op_carry_id_" },
-  //":=_": { op: (v) => parseFloat(v), name: "op_id_" },
+  ".=_": { op: (v) => parseFloat(v), name: "op_id_" },
 };
+
+const reverseOperatorMapping = (() => {
+  let rmap = {};
+  for (let k in operators) {
+    rmap[operators[k].name] = k;
+  }
+  return rmap;
+})();
 
 const formatVal = (val) => {
   if (val === undefined) {

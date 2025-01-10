@@ -47,14 +47,14 @@ div {
 }
 
 .item {
-  width: 49% !important; /* Take up slightly less than half the width */
   margin: 0.1%; /* Add some margin between the divs */
 }
 
 #cmap {
-  width: 35% !important;
+  width: 60%;
   box-shadow: 0 0 3px var(--bright-orange); /* Add a shadow */
   padding: 2em;
+  overflow: scroll;
 }
 
 #cmap:focus {
@@ -65,7 +65,7 @@ div {
 #graphviz {
   box-shadow: 0 0 3px var(--bright-yellow); /* Add a shadow */
   padding: 0.5em;
-  width: 65% !important;
+  width: 100% !important;
   overflow: hidden;
 }
 
@@ -162,4 +162,75 @@ div {
 mark {
   background: orange;
   color: black;
+}
+
+svg .fawesome {
+  font-family: "Font Awesome 6 Free Regular";
+  font-weight: 100;
+  margin-right: 5px;
+  fill: #c60;
+  cursor: default;
+}
+
+svg a {
+  text-decoration: none;
+}
+
+.crossed {
+  text-decoration: line-through;
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.3em !important; /* does not seem to work in SVG */
+  fill: var(
+    --bright-orange
+  ); /* For some reason shows as black in app mode otherwise, Safari ignores it though */
+}
+
+#help-button {
+  font-family: monoidregular;
+  position: absolute;
+  color: var(--bright-orange);
+  background-color: var(--slighty-lighter-dark-background);
+  top: 2em;
+  right: 2em;
+  width: 1.4em;
+  height: 1.4em;
+  text-align: center;
+  border-radius: 100%;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+a {
+  color: var(--bright-orange);
+}
+
+a:visited {
+  color: var(--dark-orange);
+}
+
+#help-modal {
+  position: fixed;
+  font-family: "Inter";
+  top: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5em;
+  color: var(--grey-text);
+  background-color: var(--subtly-dark-background);
+  padding: 1em 1em;
+  border-radius: 5px;
+  z-index: 1001;
+  display: none;
+}
+
+code {
+  font-size: 90%;
+  line-height: 1rem;
+  font-family: monoidregular;
+  color: var(--bright-blue);
+}
+
+code.high {
+  line-height: 1rem;
+  font-size: 180%;
 }
