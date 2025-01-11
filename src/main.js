@@ -1,6 +1,8 @@
 import { cmapRender } from "./cmap.js";
 import { graphvizRender } from "./graphviz.js";
 
+import { del, set, get, entries } from "../lib/idb-keyval.js";
+
 const d = () => document.createElement("DIV");
 const container = document.getElementById("container");
 
@@ -153,26 +155,40 @@ document.addEventListener("DOMContentLoaded", async () => {
 let searchText = "";
 const modal = document.getElementById("modal");
 
-const metaP = () => {
-  return; // Disabling for now
-  const items = Array.from(document.querySelectorAll(".item"));
-  const gcsd = (d) => window.getComputedStyle(d).display;
-  const hidden = items.filter((d) => gcsd(d) === "none");
-  console.log();
+const commands = [
+  {
+    title: "main example",
+    lambda: async () => {
+      const def = await loadFile("../examples/main-example.cmap");
+      cmapContainer.innerText = def;
+      await render();
+    },
+  },
+];
 
-  modal.innerHTML = "";
-  hidden.map((d) => {
-    const p = document.createElement("P");
-    p.innerText = d.id;
-    p.classList.add("modal-row");
-    p.style.display = "block";
-    modal.appendChild(p);
-  });
+const toggleModal = () => {
   if (modal.style.display === "block") {
     modal.style.display = "none";
   } else {
     modal.style.display = "block";
   }
+};
+
+const metaP = () => {
+  modal.innerHTML = "";
+  commands.map((d) => {
+    const p = document.createElement("P");
+    p.innerText = d.title;
+    p.classList.add("modal-row");
+    p.style.display = "block";
+    p.addEventListener("click", () => {
+      d.lambda();
+      toggleModal();
+    });
+    p.lambda = d.lambda;
+    modal.appendChild(p);
+  });
+  toggleModal();
 };
 
 async function handleFileSelection(file) {
@@ -183,6 +199,7 @@ async function handleFileSelection(file) {
     // Read the file contents
     const fileReader = new FileReader();
     fileReader.onload = (event) => {
+      console.log("File loaded");
       const fileContents = event.target.result;
       cmapContainer.innerText = fileContents;
       // For some reason I need to wait here and also await a render
@@ -198,12 +215,30 @@ async function handleFileSelection(file) {
   }
 }
 
+async function verifyPermission(fileHandle) {
+  const options = {};
+  options.mode = "readwrite";
+  // Check if permission was already granted. If so, return true.
+  if ((await fileHandle.queryPermission(options)) === "granted") {
+    return true;
+  }
+  // Request permission. If the user grants permission, return true.
+  if ((await fileHandle.requestPermission(options)) === "granted") {
+    return true;
+  }
+  // The user didn't grant permission, so return false.
+  return false;
+}
+
 async function openFile() {
   try {
     // Request file access permission (if not already granted)
     const [fileHandle] = await window.showOpenFilePicker();
-
+    verifyPermission(fileHandle);
     // Get the file from the file handle
+    if (fileHandle) {
+      await set("file", fileHandle);
+    }
     const file = await fileHandle.getFile();
 
     // Process the selected file
@@ -226,8 +261,14 @@ async function saveFile() {
       types: [{}],
     };
     const fileContent = cmapContainer.innerText;
-    const fileHandle = await window.showSaveFilePicker(options);
-    const writable = await fileHandle.createWritable();
+    let handle = await get("file");
+    if (!handle) {
+      handle = await window.showSaveFilePicker(options);
+    }
+    if (handle) {
+      await set("file", handle);
+    }
+    const writable = await handle.createWritable();
     await writable.write(fileContent);
     await writable.close();
 
@@ -279,6 +320,17 @@ document.body.addEventListener("keydown", async (ev) => {
     }
     return;
   }
+  if ((ev.key === "n" && ev.metaKey) || (ev.key === "n" && ev.ctrlKey)) {
+    console.log("M n");
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.stopImmediatePropagation();
+    cmapContainer.innerHTML = "";
+    await del("file");
+    await render();
+    await render();
+    return;
+  }
   if (ev.key === "g" && ev.metaKey) {
     console.log("M g");
     ev.preventDefault();
@@ -311,7 +363,7 @@ document.body.addEventListener("keydown", async (ev) => {
         modal.style.display = "none";
         return;
       }
-      putInFront(vizP[0].textContent);
+      vizP[0].lambda();
       searchText = "";
       modal.style.display = "none";
     } else if (ev.key.length === 1) {
@@ -378,11 +430,26 @@ help.addEventListener("click", (ev) => {
 helpModal.addEventListener("click", helpModalToggle);
 
 const init = async () => {
-  const def = await loadFile("../examples/main-example.cmap");
-  cmapContainer.innerText = def;
-  await render();
-  // Since this graph is relatively large, loading it puts it in a weird place. This should be good enough,
-  // and could actually be a good default when loading files.
+  let handle = await get("file");
+  if (handle) {
+    verifyPermission(handle);
+    // Get the file from the file handle
+    if (handle) {
+      console.log("Got handle");
+      const file = await handle.getFile();
+      handleFileSelection(file);
+      setTimeout(() => {
+        const ev = new Event("keyup", { bubbles: true });
+        cmapContainer.dispatchEvent(ev);
+      }, 100);
+    }
+  } else {
+    const def = await loadFile("../examples/main-example.cmap");
+    cmapContainer.innerText = def;
+    await render();
+    // Since this graph is relatively large, loading it puts it in a weird place. This should be good enough,
+    // and could actually be a good default when loading files.
+  }
   document.getElementById("graphviz").panzoom.zoom(0.5);
   document.getElementById("graphviz").panzoom.pan({ x: -250, y: -500 });
 };

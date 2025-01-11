@@ -127,6 +127,10 @@ div {
   display: none;
 }
 
+.modal-row {
+  cursor: pointer;
+}
+
 .error {
   border: 2px solid color-mix(in srgb, var(--bright-red) 80%, transparent);
   box-shadow: 0 0 3px var(--bright-red) !important; /* Add a shadow */

@@ -5,6 +5,7 @@ import {
   headerT,
   solarizedColors,
   darkColors,
+  lightColors,
   lateBinding,
 } from "./templates.js";
 import { operators } from "./present_eval.js";

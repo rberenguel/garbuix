@@ -3,6 +3,7 @@
 /*
 A miscellanous example showing some features
 
+- On the left hand side (here) you have a resizable, editable text field where you can write a simplified form of the dot language used by Graphviz, while on the right 👉 you will find the rendered Graphviz, scrollable and zoomable. Not downloadable yet though.
 - The first line becomes the title of the diagram.
 - Adding [calc] at the end enables operations. More below.
 - The replacement directive $DARK modifies all colours to use a Solarized-like style
