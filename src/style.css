@@ -55,6 +55,7 @@ div {
   box-shadow: 0 0 3px var(--bright-orange); /* Add a shadow */
   padding: 2em;
   overflow: scroll;
+  margin-right: 1em;
 }
 
 #cmap:focus {
