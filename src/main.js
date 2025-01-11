@@ -194,12 +194,12 @@ const metaP = () => {
 async function handleFileSelection(file) {
   // Check if a file was selected
   if (file) {
-    console.log("File selected:", file.name);
+    console.info("File selected:", file.name);
 
     // Read the file contents
     const fileReader = new FileReader();
     fileReader.onload = (event) => {
-      console.log("File loaded");
+      console.info("File loaded");
       const fileContents = event.target.result;
       cmapContainer.innerText = fileContents;
       // For some reason I need to wait here and also await a render
@@ -211,7 +211,7 @@ async function handleFileSelection(file) {
     };
     fileReader.readAsText(file); // Read the file as text
   } else {
-    console.log("No file selected.");
+    console.info("No file selected.");
   }
 }
 
@@ -272,17 +272,35 @@ async function saveFile() {
     await writable.write(fileContent);
     await writable.close();
 
-    console.log("File saved successfully.");
+    console.info("File saved successfully.");
   } catch (error) {
     console.error("Error saving file:", error);
   }
 }
 
+document.body.addEventListener("keyup", async (ev) => {
+  if (ev.key === "Backspace") {
+    const current = cmapContainer.innerText;
+    const before = window.beforeDeletion;
+    const diff = before.length - current.length;
+    if (diff / before.length > 0.5) {
+      // If we have deleted more than 50%, consider it should go into a new file
+      console.info(
+        "You deleted more than 50%, this will go into a different file now",
+      );
+      await del("file");
+    }
+  }
+});
+
 document.body.addEventListener("keydown", async (ev) => {
   const oldp = window.print;
   window.print = null;
+  if (ev.key === "Backspace") {
+    window.beforeDeletion = cmapContainer.innerText;
+  }
   if (ev.key === "p" && ev.metaKey) {
-    console.log("M p");
+    console.info("M p");
     ev.preventDefault();
     ev.stopPropagation();
     ev.stopImmediatePropagation();
@@ -290,7 +308,7 @@ document.body.addEventListener("keydown", async (ev) => {
     return;
   }
   if (ev.key === "s" && ev.metaKey) {
-    console.log("M s");
+    console.info("M s");
     ev.preventDefault();
     ev.stopPropagation();
     ev.stopImmediatePropagation();
@@ -298,7 +316,7 @@ document.body.addEventListener("keydown", async (ev) => {
     return;
   }
   if (ev.key === "o" && ev.metaKey) {
-    console.log("M o");
+    console.info("M o");
     ev.preventDefault();
     ev.stopPropagation();
     ev.stopImmediatePropagation();
@@ -307,7 +325,7 @@ document.body.addEventListener("keydown", async (ev) => {
     return;
   }
   if (ev.key === "e" && ev.metaKey) {
-    console.log("M e");
+    console.info("M e");
     ev.preventDefault();
     ev.stopPropagation();
     ev.stopImmediatePropagation();
@@ -321,7 +339,7 @@ document.body.addEventListener("keydown", async (ev) => {
     return;
   }
   if ((ev.key === "n" && ev.metaKey) || (ev.key === "n" && ev.ctrlKey)) {
-    console.log("M n");
+    console.info("M n");
     ev.preventDefault();
     ev.stopPropagation();
     ev.stopImmediatePropagation();
@@ -332,7 +350,7 @@ document.body.addEventListener("keydown", async (ev) => {
     return;
   }
   if (ev.key === "g" && ev.metaKey) {
-    console.log("M g");
+    console.info("M g");
     ev.preventDefault();
     ev.stopPropagation();
     ev.stopImmediatePropagation();
@@ -378,15 +396,12 @@ document.body.addEventListener("keydown", async (ev) => {
 });
 
 async function handleOpenedFile(launchParams) {
-  console.log("Launch params:", launchParams);
   if (launchParams.files.length > 0) {
-    console.log("Got file(s)");
     const fileHandle = launchParams.files[0];
 
     const file = await fileHandle.getFile();
 
     if (file) {
-      console.log("File opened:", file.name);
       const fileReader = new FileReader();
       fileReader.onload = (event) => {
         const fileContents = event.target.result;
@@ -398,14 +413,13 @@ async function handleOpenedFile(launchParams) {
       };
       fileReader.readAsText(file);
     } else {
-      console.log("No file opened.");
+      console.info("No file opened.");
     }
   }
 }
 
 // Check if launched from file open and handle the file
 if ("launchQueue" in window) {
-  console.log("Launch queue");
   launchQueue.setConsumer(handleOpenedFile);
 }
 
@@ -414,7 +428,6 @@ const helpModal = document.getElementById("help-modal");
 const help = document.getElementById("help-button");
 
 const helpModalToggle = () => {
-  console.log("toggled");
   if (helpModal.style.display === "block") {
     helpModal.style.display = "none";
   } else {
@@ -423,7 +436,6 @@ const helpModalToggle = () => {
 };
 
 help.addEventListener("click", (ev) => {
-  console.log("foo");
   helpModalToggle();
 });
 
@@ -435,7 +447,7 @@ const init = async () => {
     verifyPermission(handle);
     // Get the file from the file handle
     if (handle) {
-      console.log("Got handle");
+      console.info("Got a handle from indexeddb");
       const file = await handle.getFile();
       handleFileSelection(file);
       setTimeout(() => {

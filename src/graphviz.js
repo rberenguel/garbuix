@@ -100,7 +100,6 @@ const graphvizRender = async (gv, c, d, e) => {
       d.classList.remove("error");
 
       /* Big block of mess starts*/
-      console.log(c);
       d.mark = new Mark(c);
       c.mark = d.mark;
       d.addEventListener("contextmenu", (ev) => {

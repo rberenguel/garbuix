@@ -79,7 +79,6 @@ const convert = (text) => {
     lines = lightColors.split("\n").concat(sliced);
   }
   lines = lines.concat(lateBinding.split("\n"));
-  console.log(lines);
   let clusters = [];
   for (let line of lines) {
     if (line.trim() === "$DARK") {
@@ -164,7 +163,6 @@ const convert = (text) => {
     const linkUTF = hasURL(attrs[1]) ? " 🔗" : "";
     let [label, props] = attrs[1].split(";");
     if (hasArrow(line) && label.trim() == "!") {
-      console.log("It is invisible");
       label = "";
       props = (props ? props : "") + "style=invis";
     }

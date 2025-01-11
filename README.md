@@ -25,3 +25,4 @@ Maybe even add tests to the fancy functionalities (currently those are likely br
 - [idb-keyval by Jake Archibald](https://github.com/jakearchibald/idb-keyval) (not used yet, but I plan on, I have used it before)
 - [my own cmap helper](https://mostlymaths.net/2023/07/concept-maps-helper.html/)
 - [my own Weave editor](https://github.com/rberenguel/weave)
+- FontAwesome, Roboto, Monoid and Inter fonts

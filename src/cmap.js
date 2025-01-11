@@ -10,7 +10,6 @@ const cmapRender = (d) => {
     .split("\n")
     .map((l) => l.trim())
     .join("\n");
-  console.log(cmap);
   const normalize = (str) => str.normalize("NFKD");
   // Analysis and regeneration of operators is best _before_ conversion, because then I can use all the properties
   let gv;
