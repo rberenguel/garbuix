@@ -16,6 +16,7 @@ A miscellanous example showing some features
 - When using operations like these you always need to define the name of the node, it can't be implied.
 - Clusters get an invisible node with the name of the cluster. It can be sometimes useful for anchoring internal nodes, or adding an arrow from a cluster to another.
 - If you want to create a fully invisible edge (useful when battling positioning with anchors like those in a cluster) name it !, like in the tasklist cluster
+ You can recover this example by pressing `Cmd p` and choosing the obvious option. The other one is for fun (turn on volume and type)
 */
 
 $DARK

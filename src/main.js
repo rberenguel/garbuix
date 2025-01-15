@@ -1,6 +1,8 @@
 import { cmapRender } from "./cmap.js";
 import { graphvizRender } from "./graphviz.js";
 
+import { jazz } from "./jazz/jazz.js";
+
 import { del, set, get, entries } from "../lib/idb-keyval.js";
 
 const d = () => document.createElement("DIV");
@@ -154,6 +156,10 @@ const commands = [
       cmapContainer.innerText = def;
       await render();
     },
+  },
+  {
+    title: "jazz",
+    lambda: jazz,
   },
 ];
 
