@@ -191,7 +191,6 @@ const jazzKeyboardListener = (ev) => {
     window.drumNoteSampler.triggerAttackRelease("c0", 0.7, now + 0.4);
   }
   if (rhythm == 3 * keysPerBeat) {
-    const now = window.drumNoteSampler.now();
     window.drumNoteSampler.triggerAttackRelease(["c0", "d0", "e0"], 1.2);
   }
   rhythm += 1;

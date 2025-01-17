@@ -293,10 +293,11 @@ document.body.addEventListener("keyup", async (ev) => {
 document.body.addEventListener("keydown", async (ev) => {
   const oldp = window.print;
   window.print = null;
+  const cmd = ev.metaKey || ev.ctrlKey
   if (ev.key === "Backspace") {
     window.beforeDeletion = cmapContainer.innerText;
   }
-  if (ev.key === "p" && ev.metaKey) {
+  if (ev.key === "p" && cmd) {
     console.info("M p");
     ev.preventDefault();
     ev.stopPropagation();
@@ -304,7 +305,7 @@ document.body.addEventListener("keydown", async (ev) => {
     metaP();
     return;
   }
-  if (ev.key === "s" && ev.metaKey) {
+  if (ev.key === "s" && cmd) {
     console.info("M s");
     ev.preventDefault();
     ev.stopPropagation();
@@ -312,7 +313,7 @@ document.body.addEventListener("keydown", async (ev) => {
     await saveFile();
     return;
   }
-  if (ev.key === "o" && ev.metaKey) {
+  if (ev.key === "o" && cmd) {
     console.info("M o");
     ev.preventDefault();
     ev.stopPropagation();
@@ -321,7 +322,7 @@ document.body.addEventListener("keydown", async (ev) => {
     await render();
     return;
   }
-  if (ev.key === "e" && ev.metaKey) {
+  if (ev.key === "e" && cmd) {
     console.info("M e");
     ev.preventDefault();
     ev.stopPropagation();
@@ -335,7 +336,7 @@ document.body.addEventListener("keydown", async (ev) => {
     }
     return;
   }
-  if ((ev.key === "n" && ev.metaKey) || (ev.key === "n" && ev.ctrlKey)) {
+  if ((ev.key === "n" && cmd) ) {
     console.info("M n");
     ev.preventDefault();
     ev.stopPropagation();
@@ -346,7 +347,7 @@ document.body.addEventListener("keydown", async (ev) => {
     await render();
     return;
   }
-  if (ev.key === "g" && ev.metaKey) {
+  if (ev.key === "g" && cmd) {
     console.info("M g");
     ev.preventDefault();
     ev.stopPropagation();
