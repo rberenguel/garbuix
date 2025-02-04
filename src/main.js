@@ -275,7 +275,7 @@ async function saveFile() {
   }
 }
 
-document.body.addEventListener("keyup", async (ev) => {
+const keyup = async (ev) => {
   if (ev.key === "Backspace") {
     const current = cmapContainer.innerText;
     const before = window.beforeDeletion;
@@ -288,9 +288,9 @@ document.body.addEventListener("keyup", async (ev) => {
       await del("file");
     }
   }
-});
+};
 
-document.body.addEventListener("keydown", async (ev) => {
+const keydown = async (ev) => {
   const oldp = window.print;
   window.print = null;
   // The only valid use of "platform" is to choose this, actually
@@ -393,7 +393,10 @@ document.body.addEventListener("keydown", async (ev) => {
       matches.map((p) => (p.style.display = "block"));
     }
   }
-});
+};
+
+document.body.addEventListener("keyup", keyup);
+document.body.addEventListener("keydown", keydown);
 
 async function handleOpenedFile(launchParams) {
   if (launchParams.files.length > 0) {
@@ -443,6 +446,9 @@ helpModal.addEventListener("click", helpModalToggle);
 
 const init = async () => {
   let handle = await get("file");
+  const urlLoadParam = new URLSearchParams(window.location.search).get("url");
+  const urlViewParam = new URLSearchParams(window.location.search).get("view");
+  const urlLoad = urlLoadParam || urlViewParam;
   if (handle) {
     verifyPermission(handle);
     // Get the file from the file handle
@@ -456,14 +462,40 @@ const init = async () => {
       }, 100);
     }
   } else {
-    const def = await loadFile("../examples/main-example.cmap");
+    let def;
+    if (urlLoad) {
+      const response = await fetch(urlLoad);
+      if (response.ok) {
+        def = await response.text();
+      } else {
+        def = await loadFile("../examples/main-example.cmap");
+      }
+    } else {
+      def = await loadFile("../examples/main-example.cmap");
+    }
     cmapContainer.innerText = def;
     await render();
+    setTimeout(() => {
+      const ev = new Event("keyup", { bubbles: true });
+      cmapContainer.dispatchEvent(ev);
+    }, 100);
     // Since this graph is relatively large, loading it puts it in a weird place. This should be good enough,
     // and could actually be a good default when loading files.
   }
   document.getElementById("graphviz").panzoom.zoom(0.5);
   document.getElementById("graphviz").panzoom.pan({ x: -250, y: -500 });
+
+  if (urlViewParam) {
+    document.body.removeEventListener("keyup", keyup);
+    document.body.removeEventListener("keydown", keydown);
+    // Since I rely on events on the div to refresh the graph, I can't really make it
+    // invisible or undisplayed here.
+    cmapContainer.style.width = "0";
+    cmapContainer.style.padding = "0";
+    cmapContainer.style.margin = "0";
+    document.getElementById("view-only").innerHTML =
+      `<span style="font-size: 110%; margin-bottom: 1em;">&#9888; Garbuix is currently in view-only mode</span><br/><hr/>The url parameter is<br/><code>view=${urlViewParam}</code><br/>If you want to be able to edit, please use the url parameter<br/><code>url=${urlViewParam}</code>`;
+  }
 };
 
 init();

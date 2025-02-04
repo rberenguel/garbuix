@@ -228,6 +228,17 @@ a:visited {
   display: none;
 }
 
+#view-only {
+  border: 1px solid #c60;
+  padding: 0.5em;
+  border-radius: 0.1em;
+}
+
+#view-only > code {
+  font-size: 50%;
+  margin-top: 0.5em;
+}
+
 code {
   font-size: 90%;
   line-height: 1rem;
