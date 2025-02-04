@@ -293,7 +293,9 @@ document.body.addEventListener("keyup", async (ev) => {
 document.body.addEventListener("keydown", async (ev) => {
   const oldp = window.print;
   window.print = null;
-  const cmd = ev.metaKey || ev.ctrlKey
+  // The only valid use of "platform" is to choose this, actually
+  const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  const cmd = isMac ? ev.metaKey : ev.ctrlKey;
   if (ev.key === "Backspace") {
     window.beforeDeletion = cmapContainer.innerText;
   }
@@ -336,7 +338,7 @@ document.body.addEventListener("keydown", async (ev) => {
     }
     return;
   }
-  if ((ev.key === "n" && cmd) ) {
+  if (ev.key === "n" && cmd) {
     console.info("M n");
     ev.preventDefault();
     ev.stopPropagation();
