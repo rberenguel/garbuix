@@ -152,7 +152,7 @@ const commands = [
   {
     title: "main example",
     lambda: async () => {
-      const def = await loadFile("../examples/main-example.cmap");
+      const def = await loadFile("./examples/main-example.cmap");
       cmapContainer.innerText = def;
       await render();
     },
@@ -468,10 +468,10 @@ const init = async () => {
       if (response.ok) {
         def = await response.text();
       } else {
-        def = await loadFile("../examples/main-example.cmap");
+        def = await loadFile("./examples/main-example.cmap");
       }
     } else {
-      def = await loadFile("../examples/main-example.cmap");
+      def = await loadFile("./examples/main-example.cmap");
     }
     cmapContainer.innerText = def;
     await render();
