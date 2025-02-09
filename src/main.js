@@ -243,6 +243,8 @@ async function openFile() {
   } catch (error) {
     // Handle errors (e.g., user cancels the dialog)
     console.error("Error opening file:", error);
+    // Trying alternate method…
+    filePicker.click();
   }
 }
 
@@ -272,6 +274,17 @@ async function saveFile() {
     console.info("File saved successfully.");
   } catch (error) {
     console.error("Error saving file:", error);
+    const fileBlob = new Blob([cmapContainer.innerText], {
+      type: "application/octet-stream;charset=utf-8",
+    });
+    const url = URL.createObjectURL(fileBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "diagram.cmap";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   }
 }
 
@@ -482,8 +495,9 @@ const init = async () => {
     // Since this graph is relatively large, loading it puts it in a weird place. This should be good enough,
     // and could actually be a good default when loading files.
   }
-  document.getElementById("graphviz").panzoom.zoom(0.5);
-  document.getElementById("graphviz").panzoom.pan({ x: -250, y: -500 });
+  const gvp = document.getElementById("graphviz").panzoom;
+  gvp.zoom(0.5);
+  setTimeout(() => gvp.pan(-1500, -1500), 100);
 
   if (urlViewParam) {
     document.body.removeEventListener("keyup", keyup);
@@ -501,6 +515,27 @@ const init = async () => {
 const openThing = document.getElementById("open-thing");
 const saveThing = document.getElementById("save-thing");
 const menuThing = document.getElementById("menu-thing");
+
+const filePicker = document.getElementById("filePicker");
+
+// Because on mobile I can't get a native filepicker to open as part of the PWA
+filePicker.addEventListener("change", (event) => {
+  const file = event.target.files[0];
+
+  const reader = new FileReader();
+  reader.readAsText(file, "UTF-8");
+
+  reader.onload = (readerEvent) => {
+    const content = readerEvent.target.result;
+    cmapContainer.innerText = content;
+    // For some reason I need to wait here and also await a render
+    // after opening the file :unamused:
+    setTimeout(() => {
+      const ev = new Event("keyup", { bubbles: true });
+      cmapContainer.dispatchEvent(ev);
+    }, 100);
+  };
+});
 
 openThing.addEventListener("click", async () => {
   await openFile();
