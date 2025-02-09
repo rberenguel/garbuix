@@ -95,10 +95,14 @@ const graphvizRender = async (gv, c, d, e) => {
       d.querySelector("#svg-pan-zoom-controls").style.transform =
         "translate(0, 0)";
       if (pan) {
-        console.log(pan);
         // Beware of order!
-        d.panzoom.zoom(zoom);
-        d.panzoom.pan(pan);
+        try {
+          d.panzoom.zoom(zoom);
+          d.panzoom.pan(pan);
+        } catch (err) {
+          console.log("Panzoom error");
+          console.error(err);
+        }
       }
       d.classList.remove("error");
 

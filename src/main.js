@@ -488,10 +488,6 @@ const init = async () => {
     }
     cmapContainer.innerText = def;
     await render();
-    setTimeout(() => {
-      const ev = new Event("keyup", { bubbles: true });
-      cmapContainer.dispatchEvent(ev);
-    }, 100);
     // Since this graph is relatively large, loading it puts it in a weird place. This should be good enough,
     // and could actually be a good default when loading files.
   }
@@ -500,7 +496,12 @@ const init = async () => {
   const svg = document.getElementById("graphviz").querySelector("svg");
   const w = svg.width.baseVal.value;
   const h = svg.height.baseVal.value;
-  gvp.pan({ x: -w / 10, y: -h / 10 }); // Weird magic numbers
+  try {
+    gvp.pan({ x: -w / 10, y: -h / 10 }); // Weird magic numbers
+  } catch (err) {
+    console.log("Panzoom error");
+    console.error(err);
+  }
 
   if (urlViewParam) {
     document.body.removeEventListener("keyup", keyup);
@@ -510,9 +511,19 @@ const init = async () => {
     cmapContainer.style.width = "0";
     cmapContainer.style.padding = "0";
     cmapContainer.style.margin = "0";
+    cmapContainer.style.border = "0";
+    cmapContainer.style.borderRadius = "0";
+    // In Safari, text from this still shows. So… kill it.
+    cmapContainer.style.color = "var(--slighty-lighter-dark-background)";
     document.getElementById("view-only").innerHTML =
       `<span style="font-size: 110%; margin-bottom: 1em;">&#9888; Garbuix is currently in view-only mode</span><br/><hr/>The url parameter is<br/><code>view=${urlViewParam}</code><br/>If you want to be able to edit, please use the url parameter<br/><code>url=${urlViewParam}</code>`;
   }
+  // This timeout makes everything break in Safari for some reason.
+  // It might be needed though for some cases in Chrome?
+  /*setTimeout(() => {
+    const ev = new Event("keyup", { bubbles: true });
+    cmapContainer.dispatchEvent(ev);
+  });*/
 };
 
 const openThing = document.getElementById("open-thing");
