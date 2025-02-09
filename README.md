@@ -26,4 +26,4 @@ Maybe even add tests to the fancy functionalities (currently those are likely br
 - [my own cmap helper](https://mostlymaths.net/2023/07/concept-maps-helper.html/)
 - [my own Weave editor](https://github.com/rberenguel/weave)
 - [Tone.js](https://tonejs.github.io/) and several samples (see the `jazz.js` file for the full list of thanks for that)
-- FontAwesome, Roboto, Monoid and Inter fonts
+- FontAwesome, Roboto, Monoid, Reforma, and Inter fonts
