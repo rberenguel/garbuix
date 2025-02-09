@@ -205,6 +205,18 @@ svg a {
   z-index: 1001;
 }
 
+#open-thing {
+  cursor: pointer; 
+}
+
+#save-thing {
+  cursor: pointer; 
+}
+
+#menu-thing {
+  cursor: pointer; 
+}
+
 a {
   color: var(--bright-orange);
 }
