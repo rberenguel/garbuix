@@ -498,4 +498,21 @@ const init = async () => {
   }
 };
 
+const openThing = document.getElementById("open-thing");
+const saveThing = document.getElementById("save-thing");
+const menuThing = document.getElementById("menu-thing");
+
+openThing.addEventListener("click", async () => {
+  await openFile();
+  await render();
+});
+
+saveThing.addEventListener("click", async () => {
+  await saveFile();
+});
+
+menuThing.addEventListener("click", async () => {
+  metaP();
+});
+
 init();
