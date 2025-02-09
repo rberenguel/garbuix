@@ -80,31 +80,12 @@ div {
   width: 49% !important;
 }
 
-/* Media query for screens wider than 1000px and landscape orientation */
-@media (min-width: 1000px) {
-  .container {
-    flex-direction: row; /* Arrange items horizontally */
-  }
-  .item:not(:first-child) {
-    /* Hide all but the first item */
-    display: none;
-  }
-  .item:nth-child(-n + 2) {
-    /* Show the first two divs */
-    display: block;
-  }
+#source {
+  display: none;
 }
 
-/* Default styles for other screen sizes or portrait orientation */
-@media (max-width: 1000px) or (orientation: portrait) {
-  .container {
-    flex-direction: column; /* Arrange items vertically */
-  }
-
-  .item:not(:first-child) {
-    /* Hide all but the first item */
-    display: none;
-  }
+#errors {
+  display: none;
 }
 
 .source-code {

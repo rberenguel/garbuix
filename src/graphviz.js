@@ -89,7 +89,7 @@ const graphvizRender = async (gv, c, d, e) => {
       d.panzoom = svgPanZoom(d.querySelector("svg"), {
         controlIconsEnabled: true,
         dblClickZoomEnabled: false,
-        minZoom: 0.05,
+        minZoom: 0.01,
         maxZoom: 20,
       });
       d.querySelector("#svg-pan-zoom-controls").style.transform =

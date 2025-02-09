@@ -251,6 +251,13 @@ async function openFile() {
 const putInFront = (divId) => {
   const itemToMove = document.getElementById(divId);
   container.insertBefore(itemToMove, container.firstChild);
+  itemToMove.style.display = "block";
+};
+
+const hide = (divId) => {
+  const itemToMove = document.getElementById(divId);
+  //container.insertBefore(itemToMove, container.firstChild);
+  itemToMove.style.display = "none";
 };
 
 async function saveFile() {
@@ -345,9 +352,13 @@ const keydown = async (ev) => {
     if (container.children[0].id === "cmap") {
       putInFront("errors");
       putInFront("source");
+      hide("graphviz");
+      hide("cmap");
     } else {
       putInFront("graphviz");
       putInFront("cmap");
+      hide("errors");
+      hide("source");
     }
     return;
   }
