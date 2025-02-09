@@ -83,18 +83,22 @@ const graphvizRender = async (gv, c, d, e) => {
       let pan, zoom;
       if (d.panzoom) {
         pan = d.panzoom.getPan();
-        zoom = d.panzoom.getScale();
+        zoom = d.panzoom.getZoom();
       }
       d.innerHTML = rendered;
-      d.panzoom = Panzoom(d.querySelector("svg"), {
-        minScale: 0.05,
-        maxScale: 20,
+      d.panzoom = svgPanZoom(d.querySelector("svg"), {
+        controlIconsEnabled: true,
+        dblClickZoomEnabled: false,
+        minZoom: 0.05,
+        maxZoom: 20,
       });
+      d.querySelector("#svg-pan-zoom-controls").style.transform =
+        "translate(0, 0)";
       if (pan) {
         console.log(pan);
         // Beware of order!
         d.panzoom.zoom(zoom);
-        d.panzoom.pan(pan.x, pan.y);
+        d.panzoom.pan(pan);
       }
       d.classList.remove("error");
 

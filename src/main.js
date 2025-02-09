@@ -497,7 +497,10 @@ const init = async () => {
   }
   const gvp = document.getElementById("graphviz").panzoom;
   gvp.zoom(0.5);
-  setTimeout(() => gvp.pan(-1500, -1500), 100);
+  const svg = document.getElementById("graphviz").querySelector("svg");
+  const w = svg.width.baseVal.value;
+  const h = svg.height.baseVal.value;
+  gvp.pan({ x: -w / 10, y: -h / 10 }); // Weird magic numbers
 
   if (urlViewParam) {
     document.body.removeEventListener("keyup", keyup);
