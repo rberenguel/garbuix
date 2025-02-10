@@ -1,5 +1,6 @@
-// This was pretty much Gemini. It still needs work, it's a bit clunky.
-// But at least there is no need to handle carets.
+// This was pretty much Gemini, with a lot of coercing (first it wanted to reparse the whole
+// HTML structure…). It still needs work, it's a bit clunky. But at least there is no need to
+// handle carets.
 
 export class Completions {
   constructor(editor, suggestionsContainer, suggestionsList) {
@@ -15,7 +16,11 @@ export class Completions {
   }
 
   handleInput(char) {
-    // Receives the char
+    console.log(this.isInsertingSuggestion, char);
+    if (char === "\n") {
+      this.hideSuggestions();
+      return;
+    }
     this.updateCurrentWord(char); //Update the current word
 
     if (this.currentWord === "") {
@@ -23,18 +28,13 @@ export class Completions {
       this.hideSuggestions();
       return;
     }
-    if (char === "\n") {
-      this.hideSuggestions();
-      return;
-    }
-    if (this.isInsertingSuggestion) {
-      return;
-    }
+
     const filteredSuggestions = this.filterSuggestions(this.currentWord);
     this.showSuggestions(filteredSuggestions);
   }
 
   handleKeyDown(event) {
+    console.log(this.isInsertingSuggestion, event.key);
     if (this.suggestionsContainer.style.display === "block") {
       if (event.key === "Tab" || event.key === "Enter") {
         event.preventDefault();
@@ -48,7 +48,7 @@ export class Completions {
           );
           this.clearCurrentWord();
           this.hideSuggestions();
-          this.isInsertingSuggestion = false; // Reset the flag
+          this.isInsertingSuggestion = false;
         } else if (this.currentSuggestions.length > 0) {
           this.isInsertingSuggestion = true; // Set the flag
           for (let i = 0; i < this.currentWord.length; i++) {
@@ -57,7 +57,7 @@ export class Completions {
           this.simulateKeypresses(this.currentSuggestions[0]);
           this.clearCurrentWord();
           this.hideSuggestions();
-          this.isInsertingSuggestion = false; // Reset the flag
+          this.isInsertingSuggestion = false;
         }
       } else if (event.key === "ArrowUp") {
         event.preventDefault();
@@ -141,15 +141,8 @@ export class Completions {
     filteredSuggestions.forEach((suggestion) => {
       const suggestionDiv = document.createElement("div");
       suggestionDiv.textContent = suggestion;
-      suggestionDiv.addEventListener("click", () => {
-        // Simulate backspaces, then insert suggestion
-        for (let i = 0; i < this.currentWord.length; i++) {
-          this.simulateKeypress(8); //Backspace
-        }
-        this.simulateKeypresses(suggestion);
-        this.clearCurrentWord();
-        this.hideSuggestions(); //Hide suggestions!
-      });
+      // Adding a click handler would be interesting, but that would put it in the wrong place
+      // unless we kept track of the selection, etc. Too much work for a use case I don't expect
       this.suggestionsContainer.appendChild(suggestionDiv);
     });
     this.suggestionsContainer.style.display = "block";
@@ -159,6 +152,7 @@ export class Completions {
     this.suggestionsContainer.style.display = "none";
     this.currentSuggestions = [];
     this.selectedSuggestionIndex = -1;
+    this.isInsertingSuggestion = false;
   }
   simulateKeypresses(text) {
     for (let char of text) {
@@ -181,11 +175,12 @@ export class Completions {
       which: keyCode,
       view: window,
     });
-    this.editor.dispatchEvent(keydownEvent);
+    //this.editor.dispatchEvent(keydownEvent);
 
     // --- INPUT (with Selection Management) ---
     setTimeout(() => {
       // Use setTimeout for event ordering
+      this.isInsertingSuggestion = true;
       const selection = window.getSelection();
       const range =
         selection.rangeCount > 0
@@ -249,7 +244,7 @@ export class Completions {
 
       selection.removeAllRanges(); // Very important!
       selection.addRange(range); // Restore selection
-      this.editor.dispatchEvent(keyupEvent);
+      //this.editor.dispatchEvent(keyupEvent);
     }, 0);
   }
 

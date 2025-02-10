@@ -248,8 +248,8 @@ code.high {
 
 #suggestions {
   position: fixed;
-  top: 10vh;
-  left: 10vh;
+  top: 3vh;
+  left: 30vw;
   font-size: 20px;
   font-family: "monoidregular";
   color: white;
@@ -266,10 +266,4 @@ code.high {
   padding: 2px 5px;
   cursor: pointer;
   border-radius: 5px;
-}
-
-#suggestions div:hover {
-  background-color: rgba(50, 50, 50, 0.7);
-  color: var(--bright-orange);
-  border: 1px solid #999;
 }

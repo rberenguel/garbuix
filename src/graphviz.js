@@ -222,7 +222,6 @@ const graphvizRender = async (gv, c, d, e) => {
           ev.preventDefault();
           ev.stopPropagation();
           ev.stopImmediatePropagation();
-          console.log("Holding ", n);
           if (ev.button != 0) {
             // Want to avoid right-click-menu counting as hold, very annoying
             return;
@@ -232,9 +231,7 @@ const graphvizRender = async (gv, c, d, e) => {
           ev.stopImmediatePropagation();
           c.mark.unmark();
           for (let k in reverseOperatorMapping) {
-            console.log(k);
             if (titleObj.startsWith(k)) {
-              console.log("Does");
               c.mark.mark(titleObj.replace(k, reverseOperatorMapping[k]), {
                 accuracy: "exactly",
               });
@@ -277,17 +274,10 @@ const graphvizRender = async (gv, c, d, e) => {
               tspan.innerHTML = ""; // fontawesome glyph for closed checkbox
               n.classList.add("crossed");
               for (let line of cmapLines) {
-                console.log(id);
-                console.log(title);
-                console.log(cleanedTitle);
-                //const regex = new RegExp(`.*id\\s*=\\s*"${id}".*`);
                 const regex = new RegExp(
                   ".*\\[\\s{0,1}\\] " + `${cleanedTitle}.*`,
                 );
-                console.log(regex);
-                console.log(regex.test(line));
                 if (regex.test(line)) {
-                  console.log("MATCH");
                   line = line.replace("[]", "[X]").replace("[ ]", "[X]");
                 }
                 rewritten.push(line);
@@ -513,7 +503,6 @@ const graphviz = {
               ev.stopPropagation();
               ev.stopImmediatePropagation();
               div.mark.unmark();
-              console.log(titleObj);
               div.mark.mark(titleObj, { accuracy: "exactly" });
             });
             if (title.includes("🟨") || title.includes("✅")) {
@@ -545,12 +534,8 @@ const graphviz = {
                   tspan.innerHTML = ""; // fontawesome glyph for closed checkbox
                   n.classList.add("crossed");
                   for (let node of cmap.childNodes) {
-                    console.log(node.textContent);
-                    console.log(id);
                     const regex = new RegExp(`.*id\\s*=\\s*"${id}".*`);
                     if (regex.test(node.textContent)) {
-                      console.log("MATCH");
-                      console.log(node);
                       node.textContent = node.textContent
                         .replace("[]", "[X]")
                         .replace("[ ]", "[X]");
@@ -579,7 +564,11 @@ const graphviz = {
                 zoomScaleSensitivity: 1.5,
               })
               .querySelector("svg"),
-            { controlIconsEnabled: true, dblClickZoomEnabled: false },
+            {
+              controlIconsEnabled: true,
+              dblClickZoomEnabled: false,
+              preventMouseEventsDefault: false,
+            },
           );
 
           if (pan) {
