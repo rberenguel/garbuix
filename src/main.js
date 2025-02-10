@@ -4,6 +4,7 @@ import { graphvizRender } from "./graphviz.js";
 import { jazz } from "./jazz/jazz.js";
 
 import { del, set, get, entries } from "../lib/idb-keyval.js";
+import { Completions } from "./completion.js";
 
 const d = () => document.createElement("DIV");
 const container = document.getElementById("container");
@@ -13,6 +14,11 @@ cmapContainer.contentEditable = true;
 cmapContainer.id = "cmap";
 cmapContainer.classList.add("source-code", "item");
 container.appendChild(cmapContainer);
+
+const completions = new Completions(
+  cmapContainer,
+  document.getElementById("suggestions"),
+);
 
 interact("#cmap").resizable({
   edges: { left: false, right: true, bottom: false, top: false },
@@ -91,7 +97,9 @@ container.appendChild(graphvizSourceContainer);
 container.appendChild(errorsContainer);
 
 const render = async () => {
-  const gv = cmapRender(cmapContainer);
+  const rendered = cmapRender(cmapContainer);
+  const conversion = rendered.conversion;
+  const nodes = rendered.nodes;
   graphvizSourceContainer.innerHTML = "";
   //graphvizSourceContainer.innerText = gv;
   const nums = d();
@@ -101,14 +109,21 @@ const render = async () => {
   graphvizSourceContainer.appendChild(wrapper);
   const source = d();
   wrapper.appendChild(nums);
-  const lines = gv.split("\n").filter(Boolean);
+  const lines = conversion.split("\n").filter(Boolean);
   nums.innerHTML = lines
     .concat(lines)
     .map((_, i) => `<div>${i + 1}</div>`)
     .join("");
   wrapper.appendChild(source);
-  source.innerText = gv;
-  await graphvizRender(gv, cmapContainer, renderedContainer, errorsContainer);
+  source.innerText = conversion;
+  //cmapContainer.nodes = nodes
+  completions.suggestionsList = nodes;
+  await graphvizRender(
+    conversion,
+    cmapContainer,
+    renderedContainer,
+    errorsContainer,
+  );
 };
 
 cmapContainer.addEventListener("keyup", async (ev) => {
@@ -119,6 +134,7 @@ cmapContainer.addEventListener("keyup", async (ev) => {
 });
 
 cmapContainer.addEventListener("keydown", async (ev) => {
+  completions.handleKeyDown(ev);
   await render();
   if (cmapContainer.mark) {
     cmapContainer.mark.unmark();
@@ -126,7 +142,20 @@ cmapContainer.addEventListener("keydown", async (ev) => {
 });
 
 cmapContainer.addEventListener("input", async (ev) => {
+  if (ev.inputType === "insertText") {
+    completions.handleInput(ev.data); //Send the input
+  } else if (ev.inputType === "insertParagraph") {
+    completions.handleInput("\n");
+    completions.hideSuggestions(); //  Hide suggestions on Enter
+  } else if (ev.inputType === "deleteContentBackward") {
+    //Backspace
+    completions.handleInput("\b");
+  } else {
+    completions.handleInput(null); //Other events
+  }
+
   await render();
+
   if (cmapContainer.mark) {
     cmapContainer.mark.unmark();
   }

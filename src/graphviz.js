@@ -328,7 +328,6 @@ const graphvizRender = async (gv, c, d, e) => {
       document.graphviz = await Graphviz.load();
       return;
     }
-    console.log(err);
     d.classList.add("error");
     e.innerHTML = err;
   }

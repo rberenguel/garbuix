@@ -15,11 +15,12 @@ const cmapRender = (d) => {
   let gv;
   if (cmap.split("\n")[0].endsWith(" [calc]")) {
     const evaluated = evaluate(cmap);
-    gv = convert(normalize(evaluated)) + "\n}";
+    gv = convert(normalize(evaluated));
+    gv.conversion += "\n}";
   } else {
-    gv = convert(normalize(cmap)) + "\n}";
+    gv = convert(normalize(cmap));
+    gv.conversion += "\n}";
   }
-
   return gv;
 };
 

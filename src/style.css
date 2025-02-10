@@ -243,3 +243,33 @@ code.high {
   line-height: 1rem;
   font-size: 180%;
 }
+
+/*   */
+
+#suggestions {
+  position: fixed;
+  top: 10vh;
+  left: 10vh;
+  font-size: 20px;
+  font-family: "monoidregular";
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
+  border-radius: 5px;
+  display: none;
+  z-index: 10;
+  max-height: 5em;
+  overflow-y: auto;
+}
+
+#suggestions div {
+  padding: 2px 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#suggestions div:hover {
+  background-color: rgba(50, 50, 50, 0.7);
+  color: var(--bright-orange);
+  border: 1px solid #999;
+}

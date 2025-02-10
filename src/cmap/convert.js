@@ -62,6 +62,8 @@ const labelBreaker = (text) => {
 };
 
 const convert = (text) => {
+  let allNodes = {};
+  let inCommentBlock = false;
   const tab = "  ";
   const ttab = tab + tab;
   let result = [];
@@ -88,13 +90,20 @@ const convert = (text) => {
       let [key, value] = replacement;
       line = line.replaceAll(key, value);
     }
+    if (line.startsWith("/*")) {
+      inCommentBlock = true;
+    }
+    if (line.startsWith("*/")) {
+      inCommentBlock = false;
+    }
+    // Sadly I rely on having comments smartly to apply replacements, so it's not easy to force them to exist othewise
     if (
       onlyBraces(line) ||
       onlyAttrs(line) ||
       isComment(line) ||
-      line.startsWith("/*")
+      line.trim().startsWith("/*")
     ) {
-      result.push(tab + line + " // only");
+      result.push(tab + line);
       continue;
     }
     if (hasReplacement(line)) {
@@ -138,16 +147,23 @@ const convert = (text) => {
       const name = operators[op].name;
       line = line.replaceAll(op, name);
     }
-    if (hasArrow(line)) {
-      attrs = getAttrsArrow(line);
-      const match = /^\s*(\S+)\s*->\s*(\S+).*$/.exec(line);
-      src = match[1];
-      dst = match[2];
-      src = src.trim();
-      dst = dst.trim();
-    } else {
-      attrs = getAttrsNode(line);
+    try {
+      if (hasArrow(line)) {
+        attrs = getAttrsArrow(line);
+        const match = /^\s*(\S+)\s*->\s*(\S+).*$/.exec(line);
+        src = match[1];
+        dst = match[2];
+        src = src.trim();
+        dst = dst.trim();
+        allNodes[src] = true;
+        allNodes[dst] = true;
+      } else {
+        attrs = getAttrsNode(line);
+      }
+    } catch (err) {
+      // This is harmless, happens while typing
     }
+
     let addendum = "";
     if (src && clusters.includes(src)) {
       addendum = ` ltail="cluster_${src}"`;
@@ -162,6 +178,16 @@ const convert = (text) => {
     }
     const linkUTF = hasURL(attrs[1]) ? " 🔗" : "";
     let [label, props] = attrs[1].split(";");
+    label = label.trim();
+    let node = attrs[0].split(" ")[0].trim();
+
+    if (label === "") {
+      // This fixes the nodes with Name ; props i.e. with no explicit label.
+      label = node;
+    }
+    if (!hasArrow(line) && !inCommentBlock) {
+      allNodes[node] = true;
+    }
     if (hasArrow(line) && label.trim() == "!") {
       label = "";
       props = (props ? props : "") + "style=invis";
@@ -195,5 +221,5 @@ const convert = (text) => {
     header = header.replaceAll(key, value);
   }
   let joined = header + "\n" + result.join("\n");
-  return joined;
+  return { conversion: joined, nodes: Object.keys(allNodes) };
 };
