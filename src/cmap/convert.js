@@ -10,7 +10,7 @@ import {
 } from "./templates.js";
 import { operators } from "./present_eval.js";
 
-// Although this is a big dense, it is just a pretty direct term replacer,
+// Although this is a bit dense, it is just a pretty direct term replacer,
 // rewriting "my syntax" into valid Graphviz, while applying some additional
 // steps.
 
@@ -181,7 +181,7 @@ const convert = (text) => {
     label = label.trim();
     let node = attrs[0].split(" ")[0].trim();
 
-    if (label === "") {
+    if (label === "" && !hasArrow(line)) {
       // This fixes the nodes with Name ; props i.e. with no explicit label.
       label = node;
     }
