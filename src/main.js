@@ -9,6 +9,7 @@ import { Completions } from "./completion.js";
 const d = () => document.createElement("DIV");
 const container = document.getElementById("container");
 
+const info = document.querySelector("#info");
 const cmapContainer = d();
 cmapContainer.contentEditable = true;
 cmapContainer.id = "cmap";
@@ -177,6 +178,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 let searchText = "";
 const modal = document.getElementById("modal");
 
+const viewOnly = (msg) => {
+  document.body.removeEventListener("keyup", keyup);
+  document.body.removeEventListener("keydown", keydown);
+  // Since I rely on events on the div to refresh the graph, I can't really make it
+  // invisible or undisplayed here.
+  cmapContainer.style.width = "0";
+  cmapContainer.style.padding = "0";
+  cmapContainer.style.margin = "0";
+  cmapContainer.style.border = "0";
+  cmapContainer.style.borderRadius = "0";
+  // In Safari, text from this still shows. So… kill it.
+  cmapContainer.style.color = "var(--slighty-lighter-dark-background)";
+  const vo = document.getElementById("view-only");
+  vo.style.border = "1px solid #c60";
+  vo.style.padding = "0.5em";
+  vo.innerHTML = msg;
+};
+
 const commands = [
   {
     title: "main example",
@@ -189,6 +208,13 @@ const commands = [
   {
     title: "jazz",
     lambda: jazz,
+  },
+  {
+    title: "view only",
+    lambda: () => {
+      const msg = `<span style="font-size: 110%; margin-bottom: 1em;">&#9888; Garbuix is currently in view-only mode</span><br/><hr/>You did this. In an emergency, you can save from this help modal (clicking the command names).</code>`;
+      viewOnly(msg);
+    },
   },
 ];
 
@@ -270,10 +296,16 @@ async function openFile() {
     // Process the selected file
     handleFileSelection(file);
   } catch (error) {
-    // Handle errors (e.g., user cancels the dialog)
-    console.error("Error opening file:", error);
-    // Trying alternate method…
-    filePicker.click();
+    if (error.name === "AbortError") {
+      // Check for AbortError
+      console.info("User cancelled file open.");
+      return;
+    } else {
+      // Handle errors (e.g., user cancels the dialog)
+      console.error("Error opening file:", error);
+      // Trying alternate method…
+      filePicker.click();
+    }
   }
 }
 
@@ -289,13 +321,43 @@ const hide = (divId) => {
   itemToMove.style.display = "none";
 };
 
+const addPanZoom = (txt) => {
+  const hasZoom = txt.includes("// zoom: ");
+  let pastTitle = false;
+  let lines = [];
+  const zoom = renderedContainer.panzoom?.getZoom();
+  const pan = renderedContainer.panzoom?.getPan();
+  const newline = `// zoom: ${zoom} pan: ${pan.x} ${pan.y}`;
+  if (zoom === undefined || pan === undefined) {
+    return txt;
+  }
+  for (let line of txt.split("\n")) {
+    if (pastTitle && !hasZoom) {
+      lines.push("");
+      lines.push(newline);
+      lines.push("");
+      pastTitle = false;
+    }
+    if (hasZoom && line.includes("// zoom: ")) {
+      lines.push(newline);
+      continue;
+    }
+    if (line.startsWith("# ")) {
+      pastTitle = true;
+    }
+    lines.push(line);
+  }
+  return lines.join("\n");
+};
+
 async function saveFile() {
+  const fileContent = addPanZoom(cmapContainer.innerText);
   try {
     const options = {
       suggestedName: "diagram.cmap",
       types: [{}],
     };
-    const fileContent = cmapContainer.innerText;
+
     let handle = await get("file");
     if (!handle) {
       handle = await window.showSaveFilePicker(options);
@@ -306,22 +368,36 @@ async function saveFile() {
     const writable = await handle.createWritable();
     await writable.write(fileContent);
     await writable.close();
-
     console.info("File saved successfully.");
+    info.innerHTML = "&#x1F4BE;";
+    info.classList.add("fades");
   } catch (error) {
-    console.error("Error saving file:", error);
-    const fileBlob = new Blob([cmapContainer.innerText], {
-      type: "application/octet-stream;charset=utf-8",
-    });
-    const url = URL.createObjectURL(fileBlob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "diagram.cmap";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+    if (error.name === "AbortError") {
+      // Check for AbortError
+      console.info("User cancelled file save.");
+      return;
+    } else {
+      console.error("Error saving file:", error);
+      console.info("Trying fallback in case this was due to being on iOS");
+      const fileBlob = new Blob([fileContent], {
+        type: "application/octet-stream;charset=utf-8",
+      });
+      const url = URL.createObjectURL(fileBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "diagram.cmap";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      info.innerHTML = "&#x1F4BE;";
+      info.classList.add("fades");
+    }
   }
+  setTimeout(() => {
+    info.classList.remove("fades");
+    info.innerText = "";
+  }, 2000);
 }
 
 const keyup = async (ev) => {
@@ -342,8 +418,10 @@ const keyup = async (ev) => {
 const keydown = async (ev) => {
   const oldp = window.print;
   window.print = null;
-  // The only valid use of "platform" is to choose this, actually
-  const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  // The only valid use of "platform" is to choose this, actually: https://github.com/getsentry/sentry-javascript/issues/12127#issue-2306773462
+  const isMac =
+    /Mac|iPod|iPhone|iPad/.test(navigator.platform) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const cmd = isMac ? ev.metaKey : ev.ctrlKey;
   if (ev.key === "Backspace") {
     window.beforeDeletion = cmapContainer.innerText;
@@ -528,8 +606,10 @@ const init = async () => {
     }
     cmapContainer.innerText = def;
     await render();
-    // Since this graph is relatively large, loading it puts it in a weird place. This should be good enough,
-    // and could actually be a good default when loading files.
+    setTimeout(() => {
+      const ev = new Event("keyup", { bubbles: true });
+      cmapContainer.dispatchEvent(ev);
+    }, 100);
   }
   const gvp = document.getElementById("graphviz").panzoom;
   gvp.zoom(0.5);
@@ -544,19 +624,8 @@ const init = async () => {
   }
 
   if (urlViewParam) {
-    document.body.removeEventListener("keyup", keyup);
-    document.body.removeEventListener("keydown", keydown);
-    // Since I rely on events on the div to refresh the graph, I can't really make it
-    // invisible or undisplayed here.
-    cmapContainer.style.width = "0";
-    cmapContainer.style.padding = "0";
-    cmapContainer.style.margin = "0";
-    cmapContainer.style.border = "0";
-    cmapContainer.style.borderRadius = "0";
-    // In Safari, text from this still shows. So… kill it.
-    cmapContainer.style.color = "var(--slighty-lighter-dark-background)";
-    document.getElementById("view-only").innerHTML =
-      `<span style="font-size: 110%; margin-bottom: 1em;">&#9888; Garbuix is currently in view-only mode</span><br/><hr/>The url parameter is<br/><code>view=${urlViewParam}</code><br/>If you want to be able to edit, please use the url parameter<br/><code>url=${urlViewParam}</code>`;
+    const msg = `<span style="font-size: 110%; margin-bottom: 1em;">&#9888; Garbuix is currently in view-only mode</span><br/><hr/>The url parameter is<br/><code>view=${urlViewParam}</code><br/>If you want to be able to edit, please use the url parameter<br/><code>url=${urlViewParam}</code>`;
+    viewOnly(msg);
   }
   // This timeout makes everything break in Safari for some reason.
   // It might be needed though for some cases in Chrome?

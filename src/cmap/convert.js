@@ -22,12 +22,33 @@ const hasArrow = (text) => {
 const hasSubgraph = (text) => text.includes("subgraph cluster_"); // Only supporting clusters, no other
 const hasCluster = (text) => text.trim().startsWith("cluster ");
 const hasReplacement = (text) => /^\s*\$\S+\s*=\s*.*$/.test(text);
+// Note that these two regexes are intersecting
+const hasLambdaReplacement = (text) => /^\s*\$\S+\(\S+\)\s*=\s*.*$/.test(text);
 const getReplacement = (text) => {
   // If a replacement is available it is easier to _not_ use regexes
   const split = text.split("=");
   const key = split[0].trim();
   const replacement = split.slice(1).join("=").trim();
   return [key, replacement];
+};
+const getLambdaReplacement = (text) => {
+  // If a replacement is available it is easier to _not_ use regexes
+  // Format of this should be $FOO(BAR)=somethingBAR, a direct replacement
+  //$FOO(x)=#xx99xx99
+  const split = text.split("=");
+  const key = split[0].trim();
+  const fun = key.split("(")[0].trim();
+  const arg = key.split("(")[1].split(")")[0].trim();
+  const replacement = split.slice(1).join("=").trim();
+  const lambda = (foo) => {
+    if (DEBUG.convert) {
+      console.log(
+        `Lambda replacement of '${arg}' by '${foo}' in '${replacement}'`,
+      );
+    }
+    return replacement.replaceAll(arg, foo);
+  };
+  return [fun, lambda];
 };
 const hasURL = (text) => text.includes("URL=") || text.includes("URL = "); // To also cover the post-formatted case
 const isComment = (text) => /^\s*\/\/.*/.test(text);
@@ -68,6 +89,7 @@ const convert = (text) => {
   const ttab = tab + tab;
   let result = [];
   let replacements = [];
+  let lambdaReplacements = [];
   let header = headerT;
   let lines = text.split("\n");
   result.push(
@@ -86,10 +108,24 @@ const convert = (text) => {
     if (line.trim() === "$DARK") {
       continue;
     }
+    // Lambda replacements should have priority, sinche there is a natural
+    // assumption we might define YELLOW() and YELLOW
+    for (let lr of lambdaReplacements) {
+      let [funname, lambda] = lr;
+      let stringy = `\\$${funname.slice(1)}\\(([^\\)]+)\\)`;
+      let regex = new RegExp(stringy);
+
+      line = line.replace(regex, (match, arg) => {
+        // match:  The full match (e.g., "fun(foo)")
+        // arg:    The captured group (the argument, e.g., "foo")
+        return lambda(arg.trim());
+      });
+    }
     for (let replacement of replacements) {
       let [key, value] = replacement;
       line = line.replaceAll(key, value);
     }
+
     if (line.startsWith("/*")) {
       inCommentBlock = true;
     }
@@ -106,10 +142,21 @@ const convert = (text) => {
       result.push(tab + line);
       continue;
     }
+    if (hasLambdaReplacement(line)) {
+      if (DEBUG.convert)
+        console.log(`Lambda replacement found on line '${line}'`);
+      const lr = getLambdaReplacement(line);
+      const key = lr[0];
+      const value = lr[1];
+      if (DEBUG.convert) console.log(`Replacement found ${key} ${value}`);
+      lambdaReplacements.push([lr[0], lr[1]]);
+      continue;
+    }
     if (hasReplacement(line)) {
       if (DEBUG.convert) console.log(`Replacement found on line '${line}'`);
-      const key = getReplacement(line)[0];
-      const value = getReplacement(line)[1];
+      const r = getReplacement(line);
+      const key = r[0];
+      const value = r[1];
       if (DEBUG.convert) console.log(`Replacement found ${key} ${value}`);
       replacements.push([key, value]);
       continue;
@@ -215,6 +262,7 @@ const convert = (text) => {
     }
     result.push(tab + converted);
   }
+
   for (let replacement of replacements) {
     const [key, value] = replacement;
     if (DEBUG.convert) console.info(`(header) Replacing ${key} by ${value}`);

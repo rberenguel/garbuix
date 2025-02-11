@@ -103,6 +103,36 @@ const graphvizRender = async (gv, c, d, e) => {
           console.log("Panzoom error");
           console.error(err);
         }
+        if (gv.includes("// zoom:")) {
+          console.info("Has zoom directive");
+          try {
+            for (let line of gv.split("\n")) {
+              // // zoom: 1234 pan: 5 5
+              if (line.includes("// zoom:")) {
+                let fixed = line
+                  .trim()
+                  .replace("// ", "")
+                  .replace("zoom:", "")
+                  .trim();
+                let [zoom_, ...rest] = fixed.split(" ");
+                // rest = "pan", "5", "5"
+                const zoom = parseFloat(zoom_.trim());
+                const x = parseFloat(rest[1]);
+                const y = parseFloat(rest[2]);
+
+                if (Number.isNaN(x * y)) {
+                  throw new Error("Pan is not a number");
+                }
+                const pan = { x: x, y: y };
+                d.panzoom.zoom(zoom);
+                d.panzoom.pan(pan);
+              }
+            }
+          } catch (err) {
+            console.error("Error using the pan-zoom directive");
+            console.error(err);
+          }
+        }
       }
       d.classList.remove("error");
 

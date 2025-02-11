@@ -211,6 +211,8 @@ a:visited {
   font-family: "Inter";
   top: 5vh;
   left: 50%;
+  max-height: 80vh;
+  overflow-y: scroll;
   transform: translateX(-50%);
   font-size: 1.5em;
   color: var(--grey-text);
@@ -222,8 +224,6 @@ a:visited {
 }
 
 #view-only {
-  border: 1px solid #c60;
-  padding: 0.5em;
   border-radius: 0.1em;
 }
 
@@ -266,4 +266,36 @@ code.high {
   padding: 2px 5px;
   cursor: pointer;
   border-radius: 5px;
+}
+
+#info {
+  position: absolute;
+  right: 2em;
+  top: 2em;
+  opacity: 1;
+  transition: opacity 3s ease-in-out;
+  z-index: 10000;
+  line-height: 1.5;
+  font-weight: 100;
+  min-height: fit-content;
+  min-width: fit-content;
+  overflow: auto;
+  font-family: "monoidregular" !important;
+  z-index: -10000;
+}
+/*
+
+info.classList.remove("fades");
+  info.innerText = "";
+
+  */
+.fades {
+  opacity: 0 !important;
+  color: var(--dark-background) !important;
+  /* I liked the looks of these gradients here: https://codersblock.com/blog/playing-with-infinity-in-css/ */
+  background: var(--bright-orange) linear-gradient(45deg, #0006, transparent);
+  border: 1px solid var(--bright-orange);
+  border-radius: 5px;
+  padding: 1em;
+  z-index: 10000 !important;
 }

@@ -45,6 +45,14 @@ digraph G {
   `;
 
 const solarizedColors = `
+$YELLOW(X)=#b58900X
+$ORANGE(X)=#cb4b16X
+$RED(X)=#dc322fX
+$MAGENTA(X)=#d33682X
+$VIOLET(X)=#6c71c4X
+$BLUE(X)=#268bd2X
+$CYAN(X)=#2aa198X
+$GREEN(X)=#859900X
 $YELLOW=#b58900FF
 $ORANGE=#cb4b16FF
 $RED=#dc322fFF
@@ -54,6 +62,10 @@ $BLUE=#268bd2FF
 $CYAN=#2aa198FF
 $GREEN=#859900FF
 $LIGHTBACKGROUND=#fdf6e3FF
+`;
+
+const solarizedFunColors = `
+
 `;
 
 const darkColors = `
