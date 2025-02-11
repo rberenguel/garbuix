@@ -100,6 +100,7 @@ container.appendChild(errorsContainer);
 const render = async () => {
   const rendered = cmapRender(cmapContainer);
   const conversion = rendered.conversion;
+  const replacements = rendered.replacements;
   const nodes = rendered.nodes;
   graphvizSourceContainer.innerHTML = "";
   //graphvizSourceContainer.innerText = gv;
@@ -120,7 +121,7 @@ const render = async () => {
   //cmapContainer.nodes = nodes
   completions.suggestionsList = nodes;
   await graphvizRender(
-    conversion,
+    { conversion: conversion, replacements: replacements },
     cmapContainer,
     renderedContainer,
     errorsContainer,

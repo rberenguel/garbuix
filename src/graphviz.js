@@ -73,11 +73,13 @@ digraph G {
 }
     `;
 
-const graphvizRender = async (gv, c, d, e) => {
+const graphvizRender = async (info, c, d, e) => {
   try {
     if (!document.graphviz) {
       document.graphviz = await Graphviz.load();
     }
+    const gv = info.conversion;
+    const replacements = info.replacements;
     const rendered = document.graphviz.layout(gv, "svg", "dot");
     if (rendered.includes("<svg")) {
       let pan, zoom;
@@ -276,6 +278,7 @@ const graphvizRender = async (gv, c, d, e) => {
           const xmlns = "http://www.w3.org/2000/svg"; // SVG namespace URI
           const tspan = document.createElementNS(xmlns, "tspan");
           tspan.classList.add("fawesome");
+          tspan.style.fill = replacements["$CHECKBOXES"]; // Apply the color defined in the diagram, for all checkboxes
           if (title.startsWith("🟨")) {
             // Open checkbox case
             tspan.innerHTML = ""; // fontawesome glyph for open checkbox. For some reason unicode was not working
@@ -293,6 +296,7 @@ const graphvizRender = async (gv, c, d, e) => {
             cleanedTitle = n.querySelector("text").textContent.trim();
             n.querySelector("text").prepend(tspan);
             n.classList.add("crossed");
+            n.style.fill = replacements["$CROSSED"];
           }
           tspan.addEventListener("click", (ev) => {
             ev.preventDefault();
@@ -303,6 +307,7 @@ const graphvizRender = async (gv, c, d, e) => {
             if (!tspan.checked) {
               tspan.innerHTML = ""; // fontawesome glyph for closed checkbox
               n.classList.add("crossed");
+              n.style.fill = replacements["$CROSSED"];
               for (let line of cmapLines) {
                 const regex = new RegExp(
                   ".*\\[\\s{0,1}\\] " + `${cleanedTitle}.*`,

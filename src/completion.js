@@ -16,7 +16,6 @@ export class Completions {
   }
 
   handleInput(char) {
-    console.log(this.isInsertingSuggestion, char);
     if (char === "\n") {
       this.hideSuggestions();
       return;
@@ -34,7 +33,6 @@ export class Completions {
   }
 
   handleKeyDown(event) {
-    console.log(this.isInsertingSuggestion, event.key);
     if (this.suggestionsContainer.style.display === "block") {
       if (event.key === "Tab" || event.key === "Enter") {
         event.preventDefault();

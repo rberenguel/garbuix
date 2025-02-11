@@ -262,12 +262,17 @@ const convert = (text) => {
     }
     result.push(tab + converted);
   }
-
+  let replacementsMap = {};
   for (let replacement of replacements) {
     const [key, value] = replacement;
     if (DEBUG.convert) console.info(`(header) Replacing ${key} by ${value}`);
     header = header.replaceAll(key, value);
+    replacementsMap[key] = value;
   }
   let joined = header + "\n" + result.join("\n");
-  return { conversion: joined, nodes: Object.keys(allNodes) };
+  return {
+    conversion: joined,
+    nodes: Object.keys(allNodes),
+    replacements: replacementsMap,
+  };
 };
