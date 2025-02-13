@@ -139,7 +139,7 @@ const convert = (text) => {
       `label="\\n${lines[0].replace("# ", "").replace("[calc]", "")}\\n\\n";`,
   );
   const sliced = solarizedColors.split("\n").concat(lines.slice(1));
-  if (lines.map((l) => l.trim()).includes("$DARK")) {
+  if (lines.map((l) => l.trim()).includes("- dark")) {
     lines = darkColors.split("\n").concat(sliced);
   } else {
     lines = lightColors.split("\n").concat(sliced);
@@ -147,7 +147,7 @@ const convert = (text) => {
   lines = lines.concat(lateBinding.split("\n"));
   let clusters = [];
   for (let line of lines) {
-    if (line.trim() === "$DARK") {
+    if (line.trim() === "- dark") {
       continue;
     }
     // Lambda replacements should have priority, sinche there is a natural

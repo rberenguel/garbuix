@@ -6,13 +6,13 @@ digraph G {
   margin="0.5"
   bgcolor="$BACKGROUNDCOLOR"
   rankdir="TB"
-  fontname="$FONTNAME"
+  fontname="main_fontname"
   fontcolor="$FONTCOLOR"
   nodesep="0.6"
   overlap="scale"
   compound="true"
   node [
-    fontname = "$FONTNAME"
+    fontname = "main_fontname"
     style="rounded,filled"
     labelloc="c"
     margin="0.5,0.3"
@@ -28,7 +28,7 @@ digraph G {
     penwidth="2"
     color="$EDGECOLOR"
     fontcolor="$FONTCOLOR"
-    fontname="$FONTNAME"
+    fontname="main_fontname"
       fontsize="22"
       arrowhead="normal" // Latest papers about cmaps have recovered heads
   ];
@@ -45,23 +45,23 @@ digraph G {
   `;
 
 const solarizedColors = `
-$YELLOW(X)=#b58900X
-$ORANGE(X)=#cb4b16X
-$RED(X)=#dc322fX
-$MAGENTA(X)=#d33682X
-$VIOLET(X)=#6c71c4X
-$BLUE(X)=#268bd2X
-$CYAN(X)=#2aa198X
-$GREEN(X)=#859900X
-$YELLOW=#b58900FF
-$ORANGE=#cb4b16FF
-$RED=#dc322fFF
-$MAGENTA=#d33682FF
-$VIOLET=#6c71c4FF
-$BLUE=#268bd2FF
-$CYAN=#2aa198FF
-$GREEN=#859900FF
-$LIGHTBACKGROUND=#fdf6e3FF
+- yellow: #b58900
+- orange: #cb4b16
+- red: #dc322f
+- magenta: #d33682
+- violet: #6c71c4
+- blue: #268bd2
+- cyan: #2aa198
+- green: #859900
+- yellow(FF): #b58900FF
+- orange(FF): #cb4b16FF
+- red(FF): #dc322fFF
+- magenta(FF): #d33682FF
+- violet(FF): #6c71c4FF
+- blue(FF): #268bd2FF
+- cyan(FF): #2aa198FF
+- green(FF): #859900FF
+- lightbackground(FF): #fdf6e3FF
 `;
 
 const solarizedFunColors = `
@@ -92,16 +92,16 @@ $FONTCOLOR=#000000FF
 
 const lateBinding = `
 /*
-$FONTNAME=roboto
+- main_fontname: roboto
 $TITLEFONTCOLOR=$FONTCOLOR
 $TITLEFONTSIZE=38
-$TITLEFONTNAME=$FONTNAME
-$EDGECOLOR=$ORANGE
+$TITLEFONTNAME=main_fontname
+$EDGECOLOR=orange
 $NODECOLOR=$BASE0
 $BACKGROUNDCOLOR=$BASE03
 $NODEFILLCOLOR=$BACKGROUNDCOLOR
-$FONTCOLOR=$CYAN
-$CHECKBOXES=$ORANGE
-$CROSSED=$ORANGE
+$FONTCOLOR=cyan
+$CHECKBOXES=orange
+$CROSSED=orange
 */
 `;

@@ -21,10 +21,11 @@ A miscellanous example showing some features
  You can recover this example by pressing `Cmd p` and choosing the obvious option. The other one is for fun (turn on volume and type)
 */
 
-$DARK
-$TITLEFONTCOLOR=$ORANGE
+- dark
+
+$TITLEFONTCOLOR=orange
 - grey(x): #xxxxxxFF
-$EXAMPLEREPLACEMENT=color="$GREEN" fontcolor="$RED" fillcolor="grey(5)" style="rounded,dashed,filled" penwidth=3
+$EXAMPLEREPLACEMENT=color="green" fontcolor="red" fillcolor="grey(5)" style="rounded,dashed,filled" penwidth=3
 
 A -> B
 
