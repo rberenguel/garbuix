@@ -9,6 +9,7 @@ A miscellanous example showing some features
 - The replacement directive $DARK modifies all colours to use a Solarized-like style
 - The replacement directive on the line below replaces the default color used for the title by the orange defined in Solarized DARK
 - The next is how a replacement can look like. Particularly useful if you define certain nodes as "headers".
+- There is a new syntax for replacements, better looking but it is still experimental. I'll update this once it is stable. You can see a glimpse below, when I define a "lambda" replacement (it just replaces whatever is the arg in the replacement, nothing fancy)
 - Replacement directives have some minor support for templating, so you can use YELLOW(30) to set the opacity of the provided colours.
 - The syntax of a node is "NodeInOneWord optionally label with spaces ; graphviz properties". If no label is provided, the NodeInOneWord word will be used
 - The syntax of an edge is "NodeInOneWord - > AnotherNode potential text for the edge ; graphviz properties". With no spaces for the arrow, I can't write it like that here. If no label is provided, none will be used.
@@ -22,8 +23,8 @@ A miscellanous example showing some features
 
 $DARK
 $TITLEFONTCOLOR=$ORANGE
-$GREY(X)=#XXXXXXFF
-$EXAMPLEREPLACEMENT=color="$GREEN" fontcolor="$RED" fillcolor="$GREY(5)" style="rounded,dashed,filled" penwidth=3
+- grey(x): #xxxxxxFF
+$EXAMPLEREPLACEMENT=color="$GREEN" fontcolor="$RED" fillcolor="grey(5)" style="rounded,dashed,filled" penwidth=3
 
 A -> B
 

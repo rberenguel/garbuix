@@ -2,5 +2,5 @@ export { DEBUG };
 
 const DEBUG = {
   evaluate: false,
-  convert: false,
+  convert: true,
 };

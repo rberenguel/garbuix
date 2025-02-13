@@ -22,13 +22,28 @@ const hasArrow = (text) => {
 const hasSubgraph = (text) => text.includes("subgraph cluster_"); // Only supporting clusters, no other
 const hasCluster = (text) => text.trim().startsWith("cluster ");
 const hasReplacement = (text) => /^\s*\$\S+\s*=\s*.*$/.test(text);
+const hasMdReplacement = (text) => /^-\s+\S+\s*:\s*.*$/.test(text);
 // Note that these two regexes are intersecting
 const hasLambdaReplacement = (text) => /^\s*\$\S+\(\S+\)\s*=\s*.*$/.test(text);
+const hasLambdaMdReplacement = (text) => /^-\s+\S+\(\S+\)\s*:\s/.test(text);
 const getReplacement = (text) => {
   // If a replacement is available it is easier to _not_ use regexes
   const split = text.split("=");
   const key = split[0].trim();
   const replacement = split.slice(1).join("=").trim();
+  return [key, replacement];
+};
+const getMdReplacement = (text) => {
+  // If a replacement is available it is easier to _not_ use regexes
+  const split = text.split(":");
+  const key = split[0].trim().split("-")[1].trim();
+  const replacement = split.slice(1).join(":").trim();
+  if (graphvizKeywords.includes(key)) {
+    // TODO: I'm not capturing convert errors, and I should do it (when they are "own", at least)
+    throw new Error(
+      `You can't use a graphviz reserved word as a replacement (was ${key})`,
+    );
+  }
   return [key, replacement];
 };
 const getLambdaReplacement = (text) => {
@@ -48,6 +63,33 @@ const getLambdaReplacement = (text) => {
     }
     return replacement.replaceAll(arg, foo);
   };
+  return [fun, lambda];
+};
+const getLambdaMdReplacement = (text) => {
+  // If a replacement is available it is easier to _not_ use regexes
+  // Format of this should be - FOO(BAR): somethingBAR, a direct replacement
+
+  const split = text.split(":");
+  const key = split[0].trim().split("-")[1].trim();
+  const fun = key.split("(")[0].trim();
+  const arg = key.split("(")[1].split(")")[0].trim();
+  const replacement = split.slice(1).join(":").trim();
+  if (DEBUG.convert) {
+    console.log(`${fun}(${arg}) -> ${replacement}`);
+  }
+  const lambda = (foo) => {
+    if (DEBUG.convert) {
+      console.log(
+        `Lambda replacement of '${arg}' by '${foo}' in '${replacement}'`,
+      );
+    }
+    return replacement.replaceAll(arg, foo);
+  };
+  if (graphvizKeywords.includes(fun)) {
+    throw new Error(
+      `You can't use a graphviz reserved word as a replacement (was ${fun})`,
+    );
+  }
   return [fun, lambda];
 };
 const hasURL = (text) => text.includes("URL=") || text.includes("URL = "); // To also cover the post-formatted case
@@ -111,10 +153,14 @@ const convert = (text) => {
     // Lambda replacements should have priority, sinche there is a natural
     // assumption we might define YELLOW() and YELLOW
     for (let lr of lambdaReplacements) {
+      if (DEBUG.convert) {
+        //console.log(`Matching ${lr[0]}-${lr[1]} on ${line}`)
+      }
       let [funname, lambda] = lr;
-      let stringy = `\\$${funname.slice(1)}\\(([^\\)]+)\\)`;
+      const funheader = funname[0] === "$" ? "\\$" : funname[0];
+      let stringy = `${funheader}${funname.slice(1)}\\(([^\\)]+)\\)`;
       let regex = new RegExp(stringy);
-
+      console.log(regex);
       line = line.replace(regex, (match, arg) => {
         // match:  The full match (e.g., "fun(foo)")
         // arg:    The captured group (the argument, e.g., "foo")
@@ -142,6 +188,16 @@ const convert = (text) => {
       result.push(tab + line);
       continue;
     }
+    if (hasLambdaMdReplacement(line)) {
+      if (DEBUG.convert)
+        console.log(`Md Lambda replacement found on line '${line}'`);
+      const lr = getLambdaMdReplacement(line);
+      const key = `${lr[0]}`;
+      const value = lr[1];
+      if (DEBUG.convert) console.log(`Md Replacement found ${key} ${value}`);
+      lambdaReplacements.push([lr[0], lr[1]]);
+      continue;
+    }
     if (hasLambdaReplacement(line)) {
       if (DEBUG.convert)
         console.log(`Lambda replacement found on line '${line}'`);
@@ -159,6 +215,20 @@ const convert = (text) => {
       const value = r[1];
       if (DEBUG.convert) console.log(`Replacement found ${key} ${value}`);
       replacements.push([key, value]);
+      continue;
+    }
+    if (hasMdReplacement(line)) {
+      if (DEBUG.convert) console.log(`Md Replacement found on line '${line}'`);
+      const r = getMdReplacement(line);
+      const key = r[0];
+      const value = r[1];
+      if (DEBUG.convert) console.log(`Md Replacement found ${key} ${value}`);
+      replacements.push([key, value]);
+      continue;
+    }
+    // Replacements can be in comments, so they need to be processed before discarding
+    if (inCommentBlock) {
+      result.push(line.trim());
       continue;
     }
     if (hasSubgraph(line) || hasCluster(line)) {
@@ -276,3 +346,182 @@ const convert = (text) => {
     replacements: replacementsMap,
   };
 };
+
+const graphvizKeywords = [
+  "_background",
+  "area",
+  "arrowhead",
+  "arrowsize",
+  "arrowtail",
+  "bb",
+  "beautify",
+  "bgcolor",
+  "center",
+  "charset",
+  "class",
+  "cluster",
+  "clusterrank",
+  "color",
+  "colorscheme",
+  "comment",
+  "compound",
+  "concentrate",
+  "constraint",
+  "Damping",
+  "decorate",
+  "defaultdist",
+  "dim",
+  "dimen",
+  "dir",
+  "diredgeconstraints",
+  "distortion",
+  "dpi",
+  "edgehref",
+  "edgetarget",
+  "edgetooltip",
+  "edgeURL",
+  "epsilon",
+  "esep",
+  "fillcolor",
+  "fixedsize",
+  "fontcolor",
+  "fontname",
+  "fontnames",
+  "fontpath",
+  "fontsize",
+  "forcelabels",
+  "gradientangle",
+  "group",
+  "head_lp",
+  "headclip",
+  "headhref",
+  "headlabel",
+  "headport",
+  "headtarget",
+  "headtooltip",
+  "headURL",
+  "height",
+  "href",
+  "id",
+  "image",
+  "imagepath",
+  "imagepos",
+  "imagescale",
+  "inputscale",
+  "K",
+  "label",
+  "label_scheme",
+  "labelangle",
+  "labeldistance",
+  "labelfloat",
+  "labelfontcolor",
+  "labelfontname",
+  "labelfontsize",
+  "labelhref",
+  "labeljust",
+  "labelloc",
+  "labeltarget",
+  "labeltooltip",
+  "labelURL",
+  "landscape",
+  "layer",
+  "layerlistsep",
+  "layers",
+  "layerselect",
+  "layersep",
+  "layout",
+  "len",
+  "levels",
+  "levelsgap",
+  "lhead",
+  "lheight",
+  "linelength",
+  "lp",
+  "ltail",
+  "lwidth",
+  "margin",
+  "maxiter",
+  "mclimit",
+  "mindist",
+  "minlen",
+  "mode",
+  "model",
+  "newrank",
+  "nodesep",
+  "nojustify",
+  "normalize",
+  "notranslate",
+  "nslimit",
+  "nslimit1",
+  "oneblock",
+  "ordering",
+  "orientation",
+  "outputorder",
+  "overlap",
+  "overlap_scaling",
+  "overlap_shrink",
+  "pack",
+  "packmode",
+  "pad",
+  "page",
+  "pagedir",
+  "pencolor",
+  "penwidth",
+  "peripheries",
+  "pin",
+  "pos",
+  "quadtree",
+  "quantum",
+  "rank",
+  "rankdir",
+  "ranksep",
+  "ratio",
+  "rects",
+  "regular",
+  "remincross",
+  "repulsiveforce",
+  "resolution",
+  "root",
+  "rotate",
+  "rotation",
+  "samehead",
+  "sametail",
+  "samplepoints",
+  "scale",
+  "searchsize",
+  "sep",
+  "shape",
+  "shapefile",
+  "showboxes",
+  "sides",
+  "size",
+  "skew",
+  "smoothing",
+  "sortv",
+  "splines",
+  "start",
+  "style",
+  "stylesheet",
+  "tail_lp",
+  "tailclip",
+  "tailhref",
+  "taillabel",
+  "tailport",
+  "tailtarget",
+  "tailtooltip",
+  "tailURL",
+  "target",
+  "TBbalance",
+  "tooltip",
+  "truecolor",
+  "URL",
+  "vertices",
+  "viewport",
+  "voro_margin",
+  "weight",
+  "width",
+  "xdotversion",
+  "xlabel",
+  "xlp",
+  "z",
+];
