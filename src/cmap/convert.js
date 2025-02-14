@@ -36,7 +36,7 @@ const getReplacement = (text) => {
 const getMdReplacement = (text) => {
   // If a replacement is available it is easier to _not_ use regexes
   const split = text.split(":");
-  const key = split[0].trim().split("-")[1].trim();
+  const key = split[0].trim().split("-").slice(1).join("-").trim();
   const replacement = split.slice(1).join(":").trim();
   if (graphvizKeywords.includes(key)) {
     // TODO: I'm not capturing convert errors, and I should do it (when they are "own", at least)
@@ -70,7 +70,7 @@ const getLambdaMdReplacement = (text) => {
   // Format of this should be - FOO(BAR): somethingBAR, a direct replacement
 
   const split = text.split(":");
-  const key = split[0].trim().split("-")[1].trim();
+  const key = split[0].trim().split("-").slice(1).join("-").trim();
   const fun = key.split("(")[0].trim();
   const arg = key.split("(")[1].split(")")[0].trim();
   const replacement = split.slice(1).join(":").trim();
@@ -140,11 +140,10 @@ const convert = (text) => {
   );
   const sliced = solarizedColors.split("\n").concat(lines.slice(1));
   if (lines.map((l) => l.trim()).includes("- dark")) {
-    lines = darkColors.split("\n").concat(sliced);
+    lines = darkColors.split("\n").concat(lateBinding.split("\n")).concat(sliced);
   } else {
-    lines = lightColors.split("\n").concat(sliced);
+    lines = lightColors.split("\n").concat(lateBinding.split("\n")).concat(sliced);
   }
-  lines = lines.concat(lateBinding.split("\n"));
   let clusters = [];
   for (let line of lines) {
     if (line.trim() === "- dark") {
@@ -160,7 +159,6 @@ const convert = (text) => {
       const funheader = funname[0] === "$" ? "\\$" : funname[0];
       let stringy = `${funheader}${funname.slice(1)}\\(([^\\)]+)\\)`;
       let regex = new RegExp(stringy);
-      console.log(regex);
       line = line.replace(regex, (match, arg) => {
         // match:  The full match (e.g., "fun(foo)")
         // arg:    The captured group (the argument, e.g., "foo")
