@@ -369,7 +369,14 @@ const graphvizRender = async (info, c, d, e) => {
     const sDiv = document.createElement("DIV");
     sDiv.id = "error-stacktrace";
     sDiv.innerHTML = err.stack;
-    e.append(nDiv, hr(), mDiv, hr(), sDiv, hr());
+    const hDiv = document.createElement("DIV");
+    hDiv.id = "error-help";
+    const gvError =
+      "This error is likely in the graphviz conversion, so maybe you are using some unexpected name or syntax";
+    const jsError =
+      "This is likely a Javascript problem with the system. Plase report (or debug if you know how)";
+    hDiv.innerHTML = err.stack.includes("lib/graphviz.js") ? gvError : jsError;
+    e.append(nDiv, hr(), mDiv, hr(), sDiv, hr(), hDiv);
   }
 };
 
