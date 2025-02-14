@@ -75,9 +75,25 @@ div {
   width: 49% !important;
 }
 
+#error-name {
+  color: var(--bright-red);
+  font-size: 130%;
+}
+
+#error-message {
+  color: var(--bright-orange);
+  font-size: 100%;
+}
+
+#error-stacktrace {
+  color: var(--lighter-gray-text);
+  font-size: 80%;
+}
+
 #source {
   box-shadow: 0 0 3px var(--bright-blue); /* Add a shadow */
   width: 49% !important;
+  overflow: scroll;
 }
 
 #source {

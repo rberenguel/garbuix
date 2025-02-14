@@ -176,7 +176,7 @@ const evaluate = (cmapText, max_steps = 5) => {
         let attrs = split[2].trim().split(" ");
         let text;
         if (values.length > 1) {
-          text = `<<font color="$GREEN">${formatVal(
+          text = `<<font color="sdgreen">${formatVal(
             values.slice(-1)[0],
           )}</font>   (${formatVal(values[0])})`;
         } else {

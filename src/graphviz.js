@@ -191,6 +191,10 @@ const graphvizRender = async (info, c, d, e) => {
         // This should be conditional on being a op graph
         if (hasPercentageEdge(title)) {
           const polygon = e.querySelector("polygon"); // In the arrowhead
+          if (!polygon) {
+            console.debug("There are no polygons in here");
+            return;
+          }
           const pathLength = polygon.getTotalLength();
 
           // Get the coordinates of the point at 50% of the path length
@@ -278,7 +282,7 @@ const graphvizRender = async (info, c, d, e) => {
           const xmlns = "http://www.w3.org/2000/svg"; // SVG namespace URI
           const tspan = document.createElementNS(xmlns, "tspan");
           tspan.classList.add("fawesome");
-          tspan.style.fill = replacements["$CHECKBOXES"]; // Apply the color defined in the diagram, for all checkboxes
+          tspan.style.fill = replacements["checkboxes-color"]; // Apply the color defined in the diagram, for all checkboxes
           if (title.startsWith("🟨")) {
             // Open checkbox case
             tspan.innerHTML = ""; // fontawesome glyph for open checkbox. For some reason unicode was not working
@@ -296,7 +300,7 @@ const graphvizRender = async (info, c, d, e) => {
             cleanedTitle = n.querySelector("text").textContent.trim();
             n.querySelector("text").prepend(tspan);
             n.classList.add("crossed");
-            n.style.fill = replacements["$CROSSED"];
+            n.style.fill = replacements["crossed-color"];
           }
           tspan.addEventListener("click", (ev) => {
             ev.preventDefault();
@@ -307,7 +311,7 @@ const graphvizRender = async (info, c, d, e) => {
             if (!tspan.checked) {
               tspan.innerHTML = ""; // fontawesome glyph for closed checkbox
               n.classList.add("crossed");
-              n.style.fill = replacements["$CROSSED"];
+              n.style.fill = replacements["crossed-color"];
               for (let line of cmapLines) {
                 const regex = new RegExp(
                   ".*\\[\\s{0,1}\\] " + `${cleanedTitle}.*`,
@@ -354,7 +358,18 @@ const graphvizRender = async (info, c, d, e) => {
       return;
     }
     d.classList.add("error");
-    e.innerHTML = err;
+    e.innerHTML = "";
+    const hr = () => document.createElement("HR");
+    const nDiv = document.createElement("DIV");
+    nDiv.id = "error-name";
+    nDiv.innerHTML = err.name;
+    const mDiv = document.createElement("DIV");
+    mDiv.id = "error-message";
+    mDiv.innerHTML = err.message;
+    const sDiv = document.createElement("DIV");
+    sDiv.id = "error-stacktrace";
+    sDiv.innerHTML = err.stack;
+    e.append(nDiv, hr(), mDiv, hr(), sDiv, hr());
   }
 };
 

@@ -1,5 +1,6 @@
 # Test - payoffs [calc]
-$DARK
+
+- dark
 
 /*
 This is an example of a "payoff diagram". The syntax is still a bit fluid, because it is quite hard to write as is.
@@ -33,5 +34,5 @@ Quit -> *=_Promo 20% \l no
 :=_HappyPromo -> +_PromoPayoff
 :=_SadPromo -> +_PromoPayoff
 
-+_LlamaPayoff \n Potential payoff; color="$GREEN" penwidth=3
-+_PromoPayoff \n Potential payoff; color="$RED" penwidth=3
++_LlamaPayoff \n Potential payoff; color="sdgreen" penwidth=3
++_PromoPayoff \n Potential payoff; color="sdred" penwidth=3

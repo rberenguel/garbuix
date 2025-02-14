@@ -1,67 +1,82 @@
-export { headerT, solarizedColors, darkColors, lightColors, lateBinding };
+import { getAllReplacementKeys } from "./convert.js";
 
-const headerT = `
+export {
+  headerT,
+  solarizedColors,
+  darkColors,
+  lightColors,
+  lateBinding,
+  predefinedKeys,
+};
+
+const headerT = (title) => `
 digraph G {
   layout="dot"
   margin="0.5"
-  bgcolor="$BACKGROUNDCOLOR"
+  bgcolor="background-color"
   rankdir="TB"
-  fontname="$FONTNAME"
-  fontcolor="$FONTCOLOR"
+  fontname="main-fontname"
+  fontcolor="main-fontcolor"
   nodesep="0.6"
   overlap="scale"
   compound="true"
   node [
-    fontname = "$FONTNAME"
+    fontname = "main-fontname"
     style="rounded,filled"
     labelloc="c"
     margin="0.5,0.3"
     splines="true"
     shape="rect"
     fontsize="26"
-    fillcolor="$NODEFILLCOLOR"
-    color="$NODECOLOR"
-    fontcolor="$FONTCOLOR"
+    fillcolor="node-fillcolor"
+    color="node-color"
+    fontcolor="node-fontcolor"
   ];
   edge [
     minlen="3"
     penwidth="2"
-    color="$EDGECOLOR"
-    fontcolor="$FONTCOLOR"
-    fontname="$FONTNAME"
+    color="edge-color"
+    fontcolor="edge-fontcolor"
+    fontname="edge-fontname"
       fontsize="22"
-      arrowhead="normal" // Latest papers about cmaps have recovered heads
+      arrowhead="edge-arrowhead" // Latest papers about cmaps have recovered heads
   ];
+  
   graph [
     margin="8"
     style="rounded,dotted"
-    fillcolor="$NODEFILLCOLOR"
-    color="$NODECOLOR"
+    fillcolor="graph-fillcolor"
+    color="graph-color"
+    fontcolor="graph-fontcolor"
+    fontsize="graph-fontsize"
+    fontname="graph-fontname"
+    labelloc="t";
   ];
-  fontsize="$TITLEFONTSIZE"
-  fontname="$TITLEFONTNAME"
-  labelloc="t";
-  fontcolor="$TITLEFONTCOLOR"
+
+  ${title}
   `;
 
+// Note that if you have the same name for a lambda and
+// a normal definition, lambda should go first
+
 const solarizedColors = `
-$YELLOW(X)=#b58900X
-$ORANGE(X)=#cb4b16X
-$RED(X)=#dc322fX
-$MAGENTA(X)=#d33682X
-$VIOLET(X)=#6c71c4X
-$BLUE(X)=#268bd2X
-$CYAN(X)=#2aa198X
-$GREEN(X)=#859900X
-$YELLOW=#b58900FF
-$ORANGE=#cb4b16FF
-$RED=#dc322fFF
-$MAGENTA=#d33682FF
-$VIOLET=#6c71c4FF
-$BLUE=#268bd2FF
-$CYAN=#2aa198FF
-$GREEN=#859900FF
-$LIGHTBACKGROUND=#fdf6e3FF
+- sdyellow(x): #b58900x
+- sdorange(x): #cb4b16x
+- sdred(x): #dc322fx
+- sdmagenta(x): #d33682x
+- sdviolet(x): #6c71c4x
+- sdblue(x): #268bd2x
+- sdcyan(x): #2aa198x
+- sdgreen(x): #859900x
+- sdlightbackground(x): #fdf6e3x
+- sdyellow: #b58900
+- sdorange: #cb4b16
+- sdred: #dc322f
+- sdmagenta: #d33682
+- sdviolet: #6c71c4
+- sdblue: #268bd2
+- sdcyan: #2aa198
+- sdgreen: #859900
 `;
 
 const solarizedFunColors = `
@@ -69,39 +84,51 @@ const solarizedFunColors = `
 `;
 
 const darkColors = `
-$BASE03=#002B36FF
-$BASE02=#073642FF
-$BASE01=#586E75FF
-$BASE0=#657B83FF
+- sdbase03: #002B36FF
+- sdbase02: #073642FF
+- sdbase01: #586E75FF
+- sdbase0: #657B83FF
 `;
 
 const lightColors = `
-$BASE03=#fdf6e3FF
-$BASE02=#eee8d5FF
-$BASE01=#93a1a1FF
-$BASE0=#839496FF
-$EDGECOLOR=#33333388
-$NODECOLOR=#000000FF
-$BACKGROUNDCOLOR=#FFFFFFFF
-$NODEFILLCOLOR=$BACKGROUNDCOLOR
-$FONTCOLOR=#000000FF
+- base03: #fdf6e3FF
+- base02: #eee8d5FF
+- base01: #93a1a1FF
+- base0: #839496FF
+- edge-fillcolor: #33333388
+- node-color: #000000FF
+- background-color: #FFFFFFFF
+- node-fillcolor: #FFFFFFFF
+- main-fontcolor: #000000FF
 `;
 
 // These are replacements that are only used as fallbacks, so they also get themselves replaced when used.
 // Since red=cyan or similar would be an error, they are wrapped in a comment.
+// These do not cascade, are just a last resort
 
 const lateBinding = `
 /*
-$FONTNAME=roboto
-$TITLEFONTCOLOR=$FONTCOLOR
-$TITLEFONTSIZE=38
-$TITLEFONTNAME=$FONTNAME
-$EDGECOLOR=$ORANGE
-$NODECOLOR=$BASE0
-$BACKGROUNDCOLOR=$BASE03
-$NODEFILLCOLOR=$BACKGROUNDCOLOR
-$FONTCOLOR=$CYAN
-$CHECKBOXES=$ORANGE
-$CROSSED=$ORANGE
+- main-fontname: roboto
+- main-fontcolor: sdcyan
+- background-color: sdbase03
+- graph-color: sdcyan
+- graph-fontcolor: sdcyan
+- graph-fillcolor: sdbase03
+- graph-fontsize: 38
+- graph-fontname: roboto
+- node-color: sdbase0
+- node-fillcolor: sdbase03
+- node-fontcolor: sdcyan
+- node-fontname: roboto
+- edge-color: sdorange
+- edge-fontcolor: sdcyan
+- edge-fontname: roboto
+- edge-arrowhead: normal
+- checkboxes-color: sdorange
+- crossed-color: sdorange
 */
 `;
+
+const allPredefined = solarizedColors + darkColors + lightColors + lateBinding;
+
+const predefinedKeys = getAllReplacementKeys(allPredefined.split("\n"));

@@ -6,11 +6,13 @@ A miscellanous example showing some features
 - On the left hand side (here) you have a resizable, editable text field where you can write a simplified form of the dot language used by Graphviz, while on the right 👉 you will find the rendered Graphviz, scrollable and zoomable. Not downloadable yet though.
 - The first line becomes the title of the diagram.
 - Adding [calc] at the end enables operations. More below.
-- The replacement directive $DARK modifies all colours to use a Solarized-like style
-- The replacement directive on the line below replaces the default color used for the title by the orange defined in Solarized DARK
-- The next is how a replacement can look like. Particularly useful if you define certain nodes as "headers".
-- There is a new syntax for replacements, better looking but it is still experimental. I'll update this once it is stable. You can see a glimpse below, when I define a "lambda" replacement (it just replaces whatever is the arg in the replacement, nothing fancy)
-- Replacement directives have some minor support for templating, so you can use YELLOW(30) to set the opacity of the provided colours.
+- The replacement directive dark modifies all colours to use a Solarized-like dark style
+- The replacement directive on the line below replaces the default color used for the title by the orange defined in Solarized Dark
+- The next is how a replacement can look like. Particularly useful if you define certain nodes as "headers", or reuse settings.
+- A replacement can't be a graphviz keyword, to avoid getting really weird error messages. Currently this alerts as a rendering error, I plan on making it more visible.
+- Replacement directives have some minor support for templating, so you can use yellow(30) to set the opacity of the provided colours. You can also define your own, as seen in the definition of grey.
+- Anything you define will have higher priority than the default definitions as long as they are after the dark directive.
+- For a list of the controllable graph/node/edge level properties you can tweak, see the end of `src/cmap/templates.js`
 - The syntax of a node is "NodeInOneWord optionally label with spaces ; graphviz properties". If no label is provided, the NodeInOneWord word will be used
 - The syntax of an edge is "NodeInOneWord - > AnotherNode potential text for the edge ; graphviz properties". With no spaces for the arrow, I can't write it like that here. If no label is provided, none will be used.
 - You can create clusters as shown, the label will be implied. Optionally add a label or set it as the empty string to remove. Clusters inherit the title font color, size and family.
@@ -21,14 +23,18 @@ A miscellanous example showing some features
  You can recover this example by pressing `Cmd p` and choosing the obvious option. The other one is for fun (turn on volume and type)
 */
 
-$DARK
-$TITLEFONTCOLOR=$ORANGE
+- dark
+
+- graph-fontcolor: sdblue
 - grey(x): #xxxxxxFF
-$EXAMPLEREPLACEMENT=color="$GREEN" fontcolor="$RED" fillcolor="grey(5)" style="rounded,dashed,filled" penwidth=3
+- example-replacement: color="sdgreen" fontcolor="sdred" fillcolor="grey(5)" style="rounded,dashed,filled" penwidth=3
+- crossed-color: sdgreen(ff)
+- checkboxes-color: sdorange(80)
+
 
 A -> B
 
-B Another node ; fillcolor="$YELLOW(30)"
+B Another node ; fillcolor="sdyellow(10)" fontcolor="sdblue(ff)"
 
 B -> C named edge
 
@@ -37,12 +43,15 @@ A -> D ; style="dotted"
 
 cluster tasklist {
   rankdir="LR"
+  fontcolor="sdorange(80)"
   label="Checkboxes\nin a cluster"
-  finishGarbuix [ ] Finish this
+  finishGarbuix [X] Finish this
   worldDomination [ ] World domination
   finishGarbuix -> worldDomination maybe? ; style="dashed"
   worldDomination -> tasklist ! ; minlen=1
 }
+
+## You can put Markdown titles as separators and they are ignored
 
 cluster operations {
     label="Example operations"
@@ -51,7 +60,7 @@ cluster operations {
     Cost2 -> +_result 5
     x -> &&_z 90%
     y -> &&_z 30%
-    &&_z And? ; $EXAMPLEREPLACEMENT
+    &&_z And? ; example-replacement
     *=_Heads2 Heads2
     Heads1 -> *=_Heads2 50% ; minlen=1
     *=_Heads2 -> .=_Result 50% ; minlen=1
