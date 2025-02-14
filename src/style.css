@@ -80,14 +80,38 @@ div {
   font-size: 130%;
 }
 
+#error-name::before {
+  content: "\203C\FE0F ";
+  padding-right: 1em;
+}
+
 #error-message {
   color: var(--bright-orange);
   font-size: 100%;
 }
 
+#error-message::before {
+  content: "\2139\FE0F ";
+  padding-right: 1em;
+}
+
 #error-stacktrace {
   color: var(--lighter-gray-text);
   font-size: 80%;
+}
+
+#error-stacktrace::before {
+  content: "\1F50D ";
+  padding-right: 1em;
+}
+
+#error-help {
+  color: var(--green);
+}
+
+#error-help::before {
+  content: "\1F4A1 ";
+  padding-right: 1em;
 }
 
 #source {
