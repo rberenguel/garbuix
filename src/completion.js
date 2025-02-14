@@ -77,7 +77,7 @@ export class Completions {
       }
     }
     // Clear currentWord on space or enter, *even* if suggestions aren't shown
-    if (event.key === "Enter" || event.key === " ") {
+    if (event.key === "Enter" || event.key === " " || event.key === "=") {
       this.clearCurrentWord();
     }
   }

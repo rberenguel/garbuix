@@ -5,6 +5,7 @@ import { jazz } from "./jazz/jazz.js";
 
 import { del, set, get, entries } from "../lib/idb-keyval.js";
 import { Completions } from "./completion.js";
+import { predefinedKeys } from "./cmap/templates.js";
 
 const d = () => document.createElement("DIV");
 const container = document.getElementById("container");
@@ -62,20 +63,6 @@ async function loadFile(filePath) {
   }
 }
 
-/*`# foo [calc]
-$DARK
-
-$TITLEFONTCOLOR=red
-foo [ ] foo
-.=_a A
-w -> .=_a 5
-`
-*/
-/*
-`
-`;
-*/
-
 const graphvizSourceContainer = d();
 
 graphvizSourceContainer.id = "source";
@@ -103,7 +90,6 @@ const render = async () => {
   const replacements = rendered.replacements;
   const nodes = rendered.nodes;
   graphvizSourceContainer.innerHTML = "";
-  //graphvizSourceContainer.innerText = gv;
   const nums = d();
   const wrapper = d();
   wrapper.style = "display: flex;";
@@ -118,8 +104,10 @@ const render = async () => {
     .join("");
   wrapper.appendChild(source);
   source.innerText = conversion;
-  //cmapContainer.nodes = nodes
-  completions.suggestionsList = nodes;
+  const allsuggestions = nodes
+    .concat(predefinedKeys)
+    .concat(Object.keys(replacements));
+  completions.suggestionsList = [...new Set(allsuggestions)];
   await graphvizRender(
     { conversion: conversion, replacements: replacements },
     cmapContainer,

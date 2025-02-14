@@ -1,6 +1,15 @@
-export { headerT, solarizedColors, darkColors, lightColors, lateBinding };
+import { getAllReplacementKeys } from "./convert.js";
 
-const headerT = `
+export {
+  headerT,
+  solarizedColors,
+  darkColors,
+  lightColors,
+  lateBinding,
+  predefinedKeys,
+};
+
+const headerT = (title) => `
 digraph G {
   layout="dot"
   margin="0.5"
@@ -32,33 +41,34 @@ digraph G {
       fontsize="22"
       arrowhead="edge-arrowhead" // Latest papers about cmaps have recovered heads
   ];
+  
   graph [
     margin="8"
     style="rounded,dotted"
     fillcolor="graph-fillcolor"
     color="graph-color"
     fontcolor="graph-fontcolor"
+    fontsize="graph-fontsize"
+    fontname="graph-fontname"
+    labelloc="t";
   ];
-  fontsize="title-fontsize"
-  fontname="title-fontname"
-  labelloc="t";
-  fontcolor="title-fontcolor"
-  `;
 
+  ${title}
+  `;
 
 // Note that if you have the same name for a lambda and
 // a normal definition, lambda should go first
 
 const solarizedColors = `
-- sdyellow(FF): #b58900FF
-- sdorange(FF): #cb4b16FF
-- sdred(FF): #dc322fFF
-- sdmagenta(FF): #d33682FF
-- sdviolet(FF): #6c71c4FF
-- sdblue(FF): #268bd2FF
-- sdcyan(FF): #2aa198FF
-- sdgreen(FF): #859900FF
-- sdlightbackground(FF): #fdf6e3FF
+- sdyellow(x): #b58900x
+- sdorange(x): #cb4b16x
+- sdred(x): #dc322fx
+- sdmagenta(x): #d33682x
+- sdviolet(x): #6c71c4x
+- sdblue(x): #268bd2x
+- sdcyan(x): #2aa198x
+- sdgreen(x): #859900x
+- sdlightbackground(x): #fdf6e3x
 - sdyellow: #b58900
 - sdorange: #cb4b16
 - sdred: #dc322f
@@ -88,7 +98,7 @@ const lightColors = `
 - edge-fillcolor: #33333388
 - node-color: #000000FF
 - background-color: #FFFFFFFF
-- node-fillcolor: background-color
+- node-fillcolor: #FFFFFFFF
 - main-fontcolor: #000000FF
 `;
 
@@ -102,19 +112,23 @@ const lateBinding = `
 - main-fontcolor: sdcyan
 - background-color: sdbase03
 - graph-color: sdcyan
-- graph-fontcolor: sdorange
+- graph-fontcolor: sdcyan
 - graph-fillcolor: sdbase03
-- title-fontcolor: sdcyan
-- title-fontsize: 38
-- title-fontname: roboto
-- node-color: base0
-- node-fillcolor: background-color
+- graph-fontsize: 38
+- graph-fontname: roboto
+- node-color: sdbase0
+- node-fillcolor: sdbase03
 - node-fontcolor: sdcyan
 - node-fontname: roboto
 - edge-color: sdorange
 - edge-fontcolor: sdcyan
 - edge-fontname: roboto
+- edge-arrowhead: normal
 - checkboxes-color: sdorange
 - crossed-color: sdorange
 */
 `;
+
+const allPredefined = solarizedColors + darkColors + lightColors + lateBinding;
+
+const predefinedKeys = getAllReplacementKeys(allPredefined.split("\n"));

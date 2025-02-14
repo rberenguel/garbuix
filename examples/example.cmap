@@ -1,6 +1,17 @@
-# Title
+# Title (mandatory)
 
 - dark
 
+- title-fontcolor: sdred(40)
+- graph-fontcolor: sdred
+- node-fontcolor: sdblue
+- edge-color: sdorange
+
 example -> cmap with a link
 c A node
+
+## Markdown headers (with sharps) are skipped
+
+example -> a
+a -> b
+b -> c

@@ -25,9 +25,12 @@ A miscellanous example showing some features
 
 - dark
 
-- title-fontcolor: sdorange
+- graph-fontcolor: sdblue
 - grey(x): #xxxxxxFF
 - example-replacement: color="sdgreen" fontcolor="sdred" fillcolor="grey(5)" style="rounded,dashed,filled" penwidth=3
+- crossed-color: sdgreen(ff)
+- checkboxes-color: sdorange(80)
+
 
 A -> B
 
@@ -40,12 +43,15 @@ A -> D ; style="dotted"
 
 cluster tasklist {
   rankdir="LR"
+  fontcolor="sdorange(80)"
   label="Checkboxes\nin a cluster"
-  finishGarbuix [ ] Finish this
+  finishGarbuix [X] Finish this
   worldDomination [ ] World domination
   finishGarbuix -> worldDomination maybe? ; style="dashed"
   worldDomination -> tasklist ! ; minlen=1
 }
+
+## You can put Markdown titles as separators and they are ignored
 
 cluster operations {
     label="Example operations"

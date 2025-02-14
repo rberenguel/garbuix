@@ -1,4 +1,4 @@
-export { graphvizKeywords }
+export { graphvizKeywords };
 
 const graphvizKeywords = [
   "_background",
