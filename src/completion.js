@@ -33,6 +33,9 @@ export class Completions {
   }
 
   handleKeyDown(event) {
+    if(event.metaKey || event.ctrlKey){
+      return;
+    }
     if (this.suggestionsContainer.style.display === "block") {
       if (event.key === "Tab" || event.key === "Enter") {
         event.preventDefault();

@@ -4,6 +4,8 @@ import { Graphviz } from "../lib/graphviz.js";
 
 import { reverseOperatorMapping } from "./cmap/present_eval.js";
 
+import { DEBUG } from "./cmap/flags.js"
+
 const dotExample = `
 digraph G {
   layout="dot"
@@ -107,9 +109,9 @@ const graphvizRender = async (info, c, d, e) => {
           console.error(err);
         }
         if (gv.includes("// zoom:")) {
-          console.info("Has zoom directive to apply");
+          if(DEBUG.graphviz) console.info("Has zoom directive to apply");
           if (d.zoomDirectiveApplied) {
-            console.info("It has already been applied");
+            if(DEBUG.graphviz) console.info("It has already been applied");
           } else {
             try {
               for (let line of gv.split("\n")) {
