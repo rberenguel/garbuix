@@ -13,6 +13,7 @@ const container = document.getElementById("container");
 const info = document.querySelector("#info");
 const cmapContainer = d();
 cmapContainer.contentEditable = true;
+cmapContainer.spellcheck = false;
 cmapContainer.id = "cmap";
 cmapContainer.classList.add("source-code", "item");
 container.appendChild(cmapContainer);
