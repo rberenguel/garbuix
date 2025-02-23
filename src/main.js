@@ -85,7 +85,7 @@ container.appendChild(graphvizSourceContainer);
 container.appendChild(errorsContainer);
 
 const render = async (whom) => {
-  console.info(`Rendering for ${whom}`)
+  console.info(`Rendering for ${whom}`);
   const rendered = cmapRender(cmapContainer);
   const conversion = rendered.conversion;
   const replacements = rendered.replacements;
@@ -97,6 +97,7 @@ const render = async (whom) => {
   nums.classList.add("line-numbers");
   graphvizSourceContainer.appendChild(wrapper);
   const source = d();
+  source.id = "underlying-graphviz-source";
   wrapper.appendChild(nums);
   const lines = conversion.split("\n").filter(Boolean);
   nums.innerHTML = lines
@@ -105,6 +106,7 @@ const render = async (whom) => {
     .join("");
   wrapper.appendChild(source);
   source.innerText = conversion;
+  source.lines = conversion;
   const allsuggestions = nodes
     .concat(predefinedKeys)
     .concat(Object.keys(replacements));
@@ -117,21 +119,28 @@ const render = async (whom) => {
   );
 };
 
+const SKIP_KEYS = [
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "Meta",
+  "Ctrl",
+  "Alt",
+];
 
-const SKIP_KEYS = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Meta", "Ctrl", "Alt"]
-
-let lastRender = -1000
+let lastRender = -1000;
 
 cmapContainer.addEventListener("keyup", async (ev) => {
   if (cmapContainer.mark) {
     cmapContainer.mark.unmark();
   }
-  if(SKIP_KEYS.includes(ev.key)){
-    return
+  if (SKIP_KEYS.includes(ev.key)) {
+    return;
   }
-  console.log(performance.now() - lastRender)
-  await render('KeyUp');
-  lastRender = performance.now()
+  console.log(performance.now() - lastRender);
+  await render("KeyUp");
+  lastRender = performance.now();
 });
 
 cmapContainer.addEventListener("keydown", async (ev) => {
@@ -139,14 +148,14 @@ cmapContainer.addEventListener("keydown", async (ev) => {
   if (cmapContainer.mark) {
     cmapContainer.mark.unmark();
   }
-  if(SKIP_KEYS.includes(ev.key)){
-    return
-  }
-  if(performance.now() - lastRender < 100){
+  if (SKIP_KEYS.includes(ev.key)) {
     return;
   }
-  await render('KeyDown');
-  lastRender = performance.now()
+  if (performance.now() - lastRender < 100) {
+    return;
+  }
+  await render("KeyDown");
+  lastRender = performance.now();
 });
 
 cmapContainer.addEventListener("input", async (ev) => {
@@ -203,7 +212,33 @@ const viewOnly = (msg) => {
   vo.innerHTML = msg;
 };
 
+const exportToClipboard = async () => {
+  const content = graphvizSourceContainer.querySelector(
+    "#underlying-graphviz-source",
+  ).lines;
+  const text = new ClipboardItem({
+    "text/plain": Promise.resolve(content).then(
+      (text) => new Blob([text], { type: "text/plain" }),
+    ),
+  });
+  navigator.clipboard
+    .write([text])
+    .then(() => console.info("Copied successfully"))
+    .catch((err) => console.error(err));
+};
+
 const commands = [
+  {
+    title: "export to clipboard",
+    lambda: exportToClipboard,
+  },
+  {
+    title: "view only",
+    lambda: () => {
+      const msg = `<span style="font-size: 110%; margin-bottom: 1em;">&#9888; Garbuix is currently in view-only mode</span><br/><hr/>You did this. In an emergency, you can save from this help modal (clicking the command names).</code>`;
+      viewOnly(msg);
+    },
+  },
   {
     title: "main example",
     lambda: async () => {
@@ -215,13 +250,6 @@ const commands = [
   {
     title: "jazz",
     lambda: jazz,
-  },
-  {
-    title: "view only",
-    lambda: () => {
-      const msg = `<span style="font-size: 110%; margin-bottom: 1em;">&#9888; Garbuix is currently in view-only mode</span><br/><hr/>You did this. In an emergency, you can save from this help modal (clicking the command names).</code>`;
-      viewOnly(msg);
-    },
   },
 ];
 
@@ -423,6 +451,7 @@ const keyup = async (ev) => {
 };
 
 const keydown = async (ev) => {
+  console.log(ev);
   const oldp = window.print;
   window.print = null;
   // The only valid use of "platform" is to choose this, actually: https://github.com/getsentry/sentry-javascript/issues/12127#issue-2306773462
@@ -447,6 +476,14 @@ const keydown = async (ev) => {
     ev.stopPropagation();
     ev.stopImmediatePropagation();
     await saveFile();
+    return;
+  }
+  if (ev.key === "c" && cmd && ev.shiftKey) {
+    console.info("M S c");
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.stopImmediatePropagation();
+    await exportToClipboard();
     return;
   }
   if (ev.key === "o" && cmd) {

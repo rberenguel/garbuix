@@ -4,7 +4,7 @@ import { Graphviz } from "../lib/graphviz.js";
 
 import { reverseOperatorMapping } from "./cmap/present_eval.js";
 
-import { DEBUG } from "./cmap/flags.js"
+import { DEBUG } from "./cmap/flags.js";
 
 const dotExample = `
 digraph G {
@@ -89,11 +89,11 @@ const graphvizRender = async (info, c, d, e) => {
       if (d.panzoom) {
         pan = d.panzoom.getPan();
         zoom = d.panzoom.getZoom();
-        d.panzoom.destroy()
-        delete d.panzoom
+        d.panzoom.destroy();
+        delete d.panzoom;
       }
 
-      Array.from(d.querySelectorAll(".node")).map(n => interact(n).unset())
+      Array.from(d.querySelectorAll(".node")).map((n) => interact(n).unset());
 
       d.innerHTML = rendered;
       // I'm leaking SVG objects here, not sure if _only_ due to recreating panzoom every time
@@ -115,9 +115,9 @@ const graphvizRender = async (info, c, d, e) => {
           console.error(err);
         }
         if (gv.includes("// zoom:")) {
-          if(DEBUG.graphviz) console.info("Has zoom directive to apply");
+          if (DEBUG.graphviz) console.info("Has zoom directive to apply");
           if (d.zoomDirectiveApplied) {
-            if(DEBUG.graphviz) console.info("It has already been applied");
+            if (DEBUG.graphviz) console.info("It has already been applied");
           } else {
             try {
               for (let line of gv.split("\n")) {

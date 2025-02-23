@@ -33,7 +33,7 @@ export class Completions {
   }
 
   handleKeyDown(event) {
-    if(event.metaKey || event.ctrlKey){
+    if (event.metaKey || event.ctrlKey) {
       return;
     }
     if (this.suggestionsContainer.style.display === "block") {
