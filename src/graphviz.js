@@ -89,8 +89,14 @@ const graphvizRender = async (info, c, d, e) => {
       if (d.panzoom) {
         pan = d.panzoom.getPan();
         zoom = d.panzoom.getZoom();
+        d.panzoom.destroy()
+        delete d.panzoom
       }
+
+      Array.from(d.querySelectorAll(".node")).map(n => interact(n).unset())
+
       d.innerHTML = rendered;
+      // I'm leaking SVG objects here, not sure if _only_ due to recreating panzoom every time
       d.panzoom = svgPanZoom(d.querySelector("svg"), {
         controlIconsEnabled: true,
         dblClickZoomEnabled: false,
@@ -387,8 +393,8 @@ const graphvizRender = async (info, c, d, e) => {
       "This is likely a Javascript problem with the system. Plase report (or debug if you know how)";
     hDiv.innerHTML = err.stack.includes("lib/graphviz.js") ? gvError : jsError;
     e.append(nDiv, hr(), mDiv, hr(), sDiv, hr(), hDiv);
-    console.info(err);
-    console.info(info.conversion);
+    //console.info(err);
+    //console.info(info.conversion);
   }
 };
 

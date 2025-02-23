@@ -84,7 +84,8 @@ container.appendChild(renderedContainer);
 container.appendChild(graphvizSourceContainer);
 container.appendChild(errorsContainer);
 
-const render = async () => {
+const render = async (whom) => {
+  console.info(`Rendering for ${whom}`)
   const rendered = cmapRender(cmapContainer);
   const conversion = rendered.conversion;
   const replacements = rendered.replacements;
@@ -116,19 +117,36 @@ const render = async () => {
   );
 };
 
+
+const SKIP_KEYS = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Meta", "Ctrl", "Alt"]
+
+let lastRender = -1000
+
 cmapContainer.addEventListener("keyup", async (ev) => {
-  await render();
   if (cmapContainer.mark) {
     cmapContainer.mark.unmark();
   }
+  if(SKIP_KEYS.includes(ev.key)){
+    return
+  }
+  console.log(performance.now() - lastRender)
+  await render('KeyUp');
+  lastRender = performance.now()
 });
 
 cmapContainer.addEventListener("keydown", async (ev) => {
   completions.handleKeyDown(ev);
-  await render();
   if (cmapContainer.mark) {
     cmapContainer.mark.unmark();
   }
+  if(SKIP_KEYS.includes(ev.key)){
+    return
+  }
+  if(performance.now() - lastRender < 100){
+    return;
+  }
+  await render('KeyDown');
+  lastRender = performance.now()
 });
 
 cmapContainer.addEventListener("input", async (ev) => {
@@ -144,7 +162,7 @@ cmapContainer.addEventListener("input", async (ev) => {
     completions.handleInput(null); //Other events
   }
 
-  await render();
+  //await render('Input');
 
   if (cmapContainer.mark) {
     cmapContainer.mark.unmark();
