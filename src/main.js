@@ -1,3 +1,5 @@
+import { metaP } from "./metap.js";
+
 import { cmapRender } from "./cmap.js";
 import { graphvizRender } from "./graphviz.js";
 
@@ -192,9 +194,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   await render();
 });
 
-let searchText = "";
-const modal = document.getElementById("modal");
-
 const viewOnly = (msg) => {
   document.body.removeEventListener("keyup", keyup);
   document.body.removeEventListener("keydown", keydown);
@@ -254,30 +253,7 @@ const commands = [
   },
 ];
 
-const toggleModal = () => {
-  if (modal.style.display === "block") {
-    modal.style.display = "none";
-  } else {
-    modal.style.display = "block";
-  }
-};
-
-const metaP = () => {
-  modal.innerHTML = "";
-  commands.map((d) => {
-    const p = document.createElement("P");
-    p.innerText = d.title;
-    p.classList.add("modal-row");
-    p.style.display = "block";
-    p.addEventListener("click", () => {
-      d.lambda();
-      toggleModal();
-    });
-    p.lambda = d.lambda;
-    modal.appendChild(p);
-  });
-  toggleModal();
-};
+metaP.bind(commands);
 
 async function handleFileSelection(file) {
   // Check if a file was selected
@@ -453,8 +429,7 @@ const keyup = async (ev) => {
 
 const keydown = async (ev) => {
   console.log(ev);
-  const oldp = window.print;
-  window.print = null;
+
   // The only valid use of "platform" is to choose this, actually: https://github.com/getsentry/sentry-javascript/issues/12127#issue-2306773462
   const isMac =
     /Mac|iPod|iPhone|iPad/.test(navigator.platform) ||
@@ -463,14 +438,7 @@ const keydown = async (ev) => {
   if (ev.key === "Backspace") {
     window.beforeDeletion = cmapContainer.innerText;
   }
-  if (ev.key === "p" && cmd) {
-    console.info("M p");
-    ev.preventDefault();
-    ev.stopPropagation();
-    ev.stopImmediatePropagation();
-    metaP();
-    return;
-  }
+
   if (ev.key === "s" && cmd) {
     console.info("M s");
     ev.preventDefault();
@@ -539,43 +507,34 @@ const keydown = async (ev) => {
     }
     return;
   }
-
-  if (modal.style.display === "block") {
-    console.info("modal visible, stopping propagation");
-    ev.preventDefault();
-    ev.stopPropagation();
-    const ps = Array.from(modal.querySelectorAll("P"));
-    if (ev.key === "Backspace") {
-      searchText = searchText.slice(0, -1);
-    } else if (ev.key === "Escape") {
-      searchText = "";
-      modal.style.display = "none";
-    } else if (ev.key === "Enter") {
-      const vizP = ps.filter((p) => p.style.display === "block");
-      if (vizP.length === 0) {
-        searchText = "";
-        modal.style.display = "none";
-        return;
-      }
-      vizP[0].lambda();
-      searchText = "";
-      modal.style.display = "none";
-    } else if (ev.key.length === 1) {
-      searchText += ev.key;
-      const matches = ps.filter((p) =>
-        p.textContent.toLowerCase().includes(searchText),
-      );
-      ps.map((p) => (p.style.display = "none"));
-      matches.map((p) => (p.style.display = "block"));
-    }
-  }
 };
 
 document.body.addEventListener("keyup", keyup);
 document.body.addEventListener("keydown", keydown);
 
+const helpModal = document.getElementById("help-modal");
+
+const help = document.getElementById("help-button");
+
+const helpModalToggle = () => {
+  if (helpModal.style.display === "block") {
+    helpModal.style.display = "none";
+  } else {
+    helpModal.style.display = "block";
+  }
+};
+
+help.addEventListener("click", (ev) => {
+  helpModalToggle();
+});
+
+helpModal.addEventListener("click", helpModalToggle);
+
+let loadingFromLaunchParams = false;
+
 async function handleOpenedFile(launchParams) {
   if (launchParams.files.length > 0) {
+    loadingFromLaunchParams = true;
     const fileHandle = launchParams.files[0];
 
     const file = await fileHandle.getFile();
@@ -597,35 +556,20 @@ async function handleOpenedFile(launchParams) {
   }
 }
 
-// Check if launched from file open and handle the file
-if ("launchQueue" in window) {
-  launchQueue.setConsumer(handleOpenedFile);
-}
-
-const helpModal = document.getElementById("help-modal");
-
-const help = document.getElementById("help-button");
-
-const helpModalToggle = () => {
-  if (helpModal.style.display === "block") {
-    helpModal.style.display = "none";
-  } else {
-    helpModal.style.display = "block";
-  }
-};
-
-help.addEventListener("click", (ev) => {
-  helpModalToggle();
-});
-
-helpModal.addEventListener("click", helpModalToggle);
-
 const init = async () => {
+  // Check if launched from file open and handle the file
+  if ("launchQueue" in window) {
+    launchQueue.setConsumer(handleOpenedFile);
+  }
+
   let handle = await get("file");
   const urlLoadParam = new URLSearchParams(window.location.search).get("url");
   const urlViewParam = new URLSearchParams(window.location.search).get("view");
   const urlLoad = urlLoadParam || urlViewParam;
   if (handle) {
+    if (loadingFromLaunchParams) {
+      return;
+    }
     verifyPermission(handle);
     // Get the file from the file handle
     if (handle) {
@@ -638,6 +582,9 @@ const init = async () => {
       }, 100);
     }
   } else {
+    if (loadingFromLaunchParams) {
+      return;
+    }
     let def;
     if (urlLoad) {
       const response = await fetch(urlLoad);

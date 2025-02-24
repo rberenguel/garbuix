@@ -1,0 +1,26 @@
+#metap-modal {
+  position: fixed;
+  font-family: "monoidregular";
+  top: 60vh;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+
+  z-index: 1001;
+  display: none;
+}
+
+.metap-modal-row {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 0.2rem;
+}
+
+.metap-modal-row:hover {
+  cursor: pointer;
+  background-color: rgba(50, 50, 50, 0.8);
+}
