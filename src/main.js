@@ -4,7 +4,7 @@ import { cmapRender } from "./cmap.js";
 import { graphvizRender } from "./graphviz.js";
 
 import { jazz } from "./jazz/jazz.js";
-
+import { quiz } from "./quiz.js";
 import { del, set, get, entries } from "../lib/idb-keyval.js";
 import { Completions } from "./completion.js";
 import { predefinedKeys } from "./cmap/templates.js";
@@ -113,7 +113,7 @@ const render = async (whom) => {
   const allsuggestions = nodes
     .concat(predefinedKeys)
     .concat(Object.keys(replacements));
-  completions.suggestionsList = [...new Set(allsuggestions)];
+  completions.suggestionsList = []; // Temporarily disable completions. Not good [...new Set(allsuggestions)];
   await graphvizRender(
     { conversion: conversion, replacements: replacements },
     cmapContainer,
@@ -248,12 +248,24 @@ const commands = [
     },
   },
   {
+    title: "quiz",
+    lambda: quiz("graphviz", "cmap"),
+  },
+  {
     title: "jazz",
     lambda: jazz,
   },
 ];
 
 metaP.bind(commands);
+document.addEventListener("keydown", (ev) => {
+  if (ev.altKey & (ev.code === "KeyQ")) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    console.log("Quizzing");
+    quiz("graphviz", "cmap")();
+  }
+});
 
 async function handleFileSelection(file) {
   // Check if a file was selected
@@ -513,14 +525,17 @@ document.body.addEventListener("keyup", keyup);
 document.body.addEventListener("keydown", keydown);
 
 const helpModal = document.getElementById("help-modal");
+const glass = document.getElementById("glass");
 
 const help = document.getElementById("help-button");
 
 const helpModalToggle = () => {
   if (helpModal.style.display === "block") {
     helpModal.style.display = "none";
+    glass.style.display = "none";
   } else {
     helpModal.style.display = "block";
+    glass.style.display = "block";
   }
 };
 

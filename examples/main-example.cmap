@@ -13,8 +13,8 @@ A miscellanous example showing some features
 - Replacement directives have some minor support for templating, so you can use yellow(30) to set the opacity of the provided colours. You can also define your own, as seen in the definition of grey.
 - Anything you define will have higher priority than the default definitions as long as they are after the dark directive.
 - For a list of the controllable graph/node/edge level properties you can tweak, see the end of `src/cmap/templates.js`
-- The syntax of a node is "NodeInOneWord optionally label with spaces ; graphviz properties". If no label is provided, the NodeInOneWord word will be used
-- The syntax of an edge is "NodeInOneWord - > AnotherNode potential text for the edge ; graphviz properties". With no spaces for the arrow, I can't write it like that here. If no label is provided, none will be used.
+- The syntax of a node is NodeInOneWord optionally label with spaces ; graphviz properties  If no label is provided, the NodeInOneWord word will be used
+- The syntax of an edge is NodeInOneWord - > AnotherNode potential text for the edge ; graphviz properties  With no spaces for the arrow, I can't write it like that here. If no label is provided, none will be used.
 - You can create clusters as shown, the label will be implied. Optionally add a label or set it as the empty string to remove. Clusters inherit the title font color, size and family.
 - You can create tasks. Checking and unchecking should modify the source. It always seems to do it, but it is brittle.
 - When using operations like these you always need to define the name of the node, it can't be implied.
