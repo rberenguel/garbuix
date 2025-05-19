@@ -296,7 +296,15 @@ const graphvizRender = async (info, c, d, e) => {
           const xmlns = "http://www.w3.org/2000/svg"; // SVG namespace URI
           const tspan = document.createElementNS(xmlns, "tspan");
           tspan.classList.add("fawesome");
-          tspan.style.fill = replacements["checkboxes-color"]; // Apply the color defined in the diagram, for all checkboxes
+          const surroundingText = n.querySelector("TEXT");
+          let styledFill;
+          if (surroundingText) {
+            styledFill = window.getComputedStyle(surroundingText).fill;
+          } else {
+            // TODO This is unlikely to ever happen now, should I remove it?
+            styledFill = replacements["checkboxes-color"];
+          }
+          tspan.style.fill = styledFill;
           if (title.startsWith("🟨")) {
             // Open checkbox case
             tspan.innerHTML = ""; // fontawesome glyph for open checkbox. For some reason unicode was not working
@@ -314,6 +322,7 @@ const graphvizRender = async (info, c, d, e) => {
             cleanedTitle = n.querySelector("text").textContent.trim();
             n.querySelector("text").prepend(tspan);
             n.classList.add("crossed");
+            console.log(n);
             n.style.fill = replacements["crossed-color"];
           }
           tspan.addEventListener("click", (ev) => {
@@ -325,6 +334,7 @@ const graphvizRender = async (info, c, d, e) => {
             if (!tspan.checked) {
               tspan.innerHTML = ""; // fontawesome glyph for closed checkbox
               n.classList.add("crossed");
+              console.log(n);
               n.style.fill = replacements["crossed-color"];
               for (let line of cmapLines) {
                 const regex = new RegExp(
