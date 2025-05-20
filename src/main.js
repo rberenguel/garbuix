@@ -137,15 +137,15 @@ const SKIP_KEYS = [
 let lastRender = -1000;
 
 const markTitles = () => {
-  cmapContainer.titleMark.markRegExp(/\/\* # .*/gim, {
+  cmapContainer.titleMark.markRegExp(/^\/\* # .*/gim, {
     element: "span",
     className: "h1cmap",
   });
-  cmapContainer.titleMark.markRegExp(/\/\* ## .*/gim, {
+  cmapContainer.titleMark.markRegExp(/^\/\* ## .*/gim, {
     element: "span",
     className: "h2cmap",
   });
-  cmapContainer.titleMark.markRegExp(/\/\* ### .*/gim, {
+  cmapContainer.titleMark.markRegExp(/^\/\* ### .*/gim, {
     element: "span",
     className: "h3cmap",
   });
