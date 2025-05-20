@@ -20,6 +20,8 @@ cmapContainer.id = "cmap";
 cmapContainer.classList.add("source-code", "item");
 container.appendChild(cmapContainer);
 
+cmapContainer.titleMark = new Mark(cmapContainer);
+
 const completions = new Completions(
   cmapContainer,
   document.getElementById("suggestions"),
@@ -134,6 +136,21 @@ const SKIP_KEYS = [
 
 let lastRender = -1000;
 
+const markTitles = () => {
+  cmapContainer.titleMark.markRegExp(/\/\* # .*/gim, {
+    element: "span",
+    className: "h1cmap",
+  });
+  cmapContainer.titleMark.markRegExp(/\/\* ## .*/gim, {
+    element: "span",
+    className: "h2cmap",
+  });
+  cmapContainer.titleMark.markRegExp(/\/\* ### .*/gim, {
+    element: "span",
+    className: "h3cmap",
+  });
+};
+
 cmapContainer.addEventListener("keyup", async (ev) => {
   if (cmapContainer.mark) {
     cmapContainer.mark.unmark();
@@ -144,6 +161,9 @@ cmapContainer.addEventListener("keyup", async (ev) => {
   console.log(performance.now() - lastRender);
   await render("KeyUp");
   lastRender = performance.now();
+  if (ev.key === "Enter") {
+    //markTitles()
+  }
 });
 
 cmapContainer.addEventListener("keydown", async (ev) => {
@@ -185,6 +205,7 @@ cmapContainer.addEventListener("click", (ev) => {
   if (cmapContainer.mark) {
     cmapContainer.mark.unmark();
   }
+  markTitles();
 });
 
 // For some reason insisting makes it work better.

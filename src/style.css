@@ -342,3 +342,20 @@ info.classList.remove("fades");
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
+
+/* Mark title CSS */
+
+.h1cmap {
+  font-size: 2rem;
+  color: var(--dark-orange);
+}
+
+.h2cmap {
+  font-size: 1.6rem;
+  color: var(--dark-orange);
+}
+
+.h3cmap {
+  font-size: 1.3rem;
+  color: var(--dark-orange);
+}
