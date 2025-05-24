@@ -136,7 +136,7 @@ const SKIP_KEYS = [
 
 let lastRender = -1000;
 
-const markTitles = () => {
+const markSeparators = () => {
   cmapContainer.titleMark.markRegExp(/^\/\* # .*/gim, {
     element: "span",
     className: "h1cmap",
@@ -148,6 +148,10 @@ const markTitles = () => {
   cmapContainer.titleMark.markRegExp(/^\/\* ### .*/gim, {
     element: "span",
     className: "h3cmap",
+  });
+  cmapContainer.titleMark.markRegExp(/^\/\* --- .*/gim, {
+    element: "hr",
+    className: "hrcmap",
   });
 };
 
@@ -162,7 +166,7 @@ cmapContainer.addEventListener("keyup", async (ev) => {
   await render("KeyUp");
   lastRender = performance.now();
   if (ev.key === "Enter") {
-    //markTitles()
+    //markSeparators() // It's annoying when redraw happens on type
   }
 });
 
@@ -205,7 +209,7 @@ cmapContainer.addEventListener("click", (ev) => {
   if (cmapContainer.mark) {
     cmapContainer.mark.unmark();
   }
-  markTitles();
+  markSeparators();
 });
 
 // For some reason insisting makes it work better.

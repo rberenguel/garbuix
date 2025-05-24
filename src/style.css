@@ -17,7 +17,7 @@
   --bright-blue: #06c;
   --very-bright-red: #c00;
   --bright-red: #c00;
-  --wired-code: #2aa198;
+  --cyan: #2aa198;
   --yellow: #b58900;
   --dark-orange: #a60;
   --dark-red: #800;
@@ -346,16 +346,21 @@ info.classList.remove("fades");
 /* Mark title CSS */
 
 .h1cmap {
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: var(--dark-orange);
 }
 
 .h2cmap {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: var(--dark-orange);
 }
 
 .h3cmap {
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   color: var(--dark-orange);
+}
+
+.hrcmap {
+  height: 0;
+  border-color: var(--cyan);
 }
